@@ -130,8 +130,11 @@
     display: none;
   }
 
+  /* Just the mark, but still a full control's width to tap. */
   .cw-header .cw-brand {
     gap: 0;
+    min-width: var(--cw-control-h);
+    justify-content: center;
   }
 
   .cw-account-name {
