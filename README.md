@@ -16,8 +16,16 @@ Then, at the top of the app's main stylesheet:
 @import "@cornerways/design/styles.css";
 ```
 
-That loads the fonts and defines every `--cw-*` token. Nothing changes until
-the app uses them.
+and in the page's `<head>`, the one Google Fonts request (the href is also
+exported as `GOOGLE_FONTS_HREF`):
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet" />
+```
+
+That defines every `--cw-*` token. Nothing changes until the app uses them.
 
 ```tsx
 import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
@@ -27,7 +35,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 
 | File | Contents |
 |---|---|
-| `src/fonts.css` | Figtree (UI) and Source Serif 4 (display) from Google Fonts, with system-ui and Georgia fallbacks |
+| `src/fonts.css`, `src/fonts.ts` | Font-family tokens for Figtree (UI) and Source Serif 4 (display) with system-ui and Georgia fallbacks, and the Google Fonts href |
 | `src/tokens.css` | Colours (light and dark), per-app accents, sizes, radii, shadows, z-index |
 | `src/base.css` | `.cw-workspace` and `.cw-reading` layout wrappers |
 | `src/apps.ts` | The app list: names, hosts, dev ports, accents, layout mode |
