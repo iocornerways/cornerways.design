@@ -4,7 +4,9 @@
   "private": true,
   "description": "The shared Cornerways shell: design tokens, fonts, layout modes, header and controls, used by every *.cornerways.io site.",
   "type": "module",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
@@ -13,9 +15,12 @@
     "./base.css": "./src/base.css",
     "./package.json": "./package.json"
   },
-  "files": ["src", "README.md"],
+  "files": [
+    "src",
+    "README.md"
+  ],
   "scripts": {
-    "preview": "vite preview-site",
+    "preview": "vite --open /preview-site/",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

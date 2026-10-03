@@ -40,7 +40,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `src/base.css` | `.cw-workspace` and `.cw-reading` layout wrappers |
 | `src/apps.ts` | The app list: names, hosts, dev ports, accents, layout mode |
 | `src/layout.tsx` | `<Workspace>` and `<Reading>` components |
-| `preview-site/` | Token specimen page, both themes: `npm run preview` |
+| `preview-site/` | Token specimen page, both themes: `npm run preview` (serves the repo root and opens `/preview-site/`) |
 
 ## Layout modes
 
