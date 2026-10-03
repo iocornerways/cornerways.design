@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode, Ref } from "react";
 
 function join(...classes: Array<string | undefined | false | null>): string {
   return classes.filter(Boolean).join(" ");
@@ -44,18 +44,21 @@ export function Button(props: ButtonAsButton | ButtonAsLink) {
   );
 }
 
-interface IconButtonProps extends ComponentPropsWithRef<"button"> {
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** What it does — read by screen readers and shown as the tooltip. */
   label: string;
   children: ReactNode;
   /** Lit in the brand accent, for a toggle that is on. */
   active?: boolean;
+  /** For anchoring a popover or a tip to the button. */
+  ref?: Ref<HTMLButtonElement>;
 }
 
 /** A 40×40 bordered square holding one line icon. */
-export function IconButton({ label, children, active, className, ...rest }: IconButtonProps) {
+export function IconButton({ label, children, active, className, ref, ...rest }: IconButtonProps) {
   return (
     <button
+      ref={ref}
       type="button"
       className={join("cw-icon-button", active && "cw-icon-button--active", className)}
       aria-label={label}
@@ -70,17 +73,18 @@ export function IconButton({ label, children, active, className, ...rest }: Icon
 
 /* ---------- Filter pill ---------- */
 
-interface PillProps extends ComponentPropsWithRef<"button"> {
+interface PillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
   /** A colour dot, for a person or category. */
   dot?: string;
   children: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 /** A fully rounded toggle for filters. */
-export function Pill({ active = false, dot, children, className, ...rest }: PillProps) {
+export function Pill({ active = false, dot, children, className, ref, ...rest }: PillProps) {
   return (
-    <button type="button" className={join("cw-pill", className)} aria-pressed={active} {...rest}>
+    <button ref={ref} type="button" className={join("cw-pill", className)} aria-pressed={active} {...rest}>
       {dot && <span className="cw-pill-dot" style={{ background: dot }} aria-hidden="true" />}
       {children}
     </button>
