@@ -9,6 +9,7 @@
    importing it changes nothing until a page opts in with these classes. */
 
 .cw-workspace {
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   padding-inline: var(--cw-gutter);
@@ -20,6 +21,7 @@
 }
 
 .cw-reading {
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
   max-width: calc(var(--cw-reading-width) + 2 * var(--cw-gutter));
