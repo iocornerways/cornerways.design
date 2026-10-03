@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
 
 function join(...classes: Array<string | undefined | false | null>): string {
   return classes.filter(Boolean).join(" ");
@@ -44,7 +44,7 @@ export function Button(props: ButtonAsButton | ButtonAsLink) {
   );
 }
 
-interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends ComponentPropsWithRef<"button"> {
   /** What it does — read by screen readers and shown as the tooltip. */
   label: string;
   children: ReactNode;
@@ -70,7 +70,7 @@ export function IconButton({ label, children, active, className, ...rest }: Icon
 
 /* ---------- Filter pill ---------- */
 
-interface PillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface PillProps extends ComponentPropsWithRef<"button"> {
   active?: boolean;
   /** A colour dot, for a person or category. */
   dot?: string;
