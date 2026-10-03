@@ -34,8 +34,8 @@ export interface HeaderProps {
   /** Where Settings goes. Omit to leave Settings out of the menu. */
   settingsHref?: string;
   onSettings?: () => void;
-  /** Overrides the hub's /household page. */
-  householdHref?: string;
+  /** Overrides the hub's /household page; null leaves Household out (a guest with no household). */
+  householdHref?: string | null;
   /** How to sign out. Omit to leave Log out of the menu. */
   logout?: LogoutAction;
   /** The current hostname; defaults to the browser's. Lets the hub pick dev ports and test hosts. */
@@ -55,7 +55,7 @@ function currentHostname(hostname?: string): string {
 export function Header({ app, actions, account, theme, settingsHref, onSettings, householdHref, logout, hostname }: HeaderProps) {
   const host = currentHostname(hostname);
   const hub = hubUrl(host);
-  const household = householdHref ?? `${hub}/household`;
+  const household = householdHref === undefined ? `${hub}/household` : householdHref;
 
   return (
     <header className="cw-header">
@@ -77,9 +77,11 @@ export function Header({ app, actions, account, theme, settingsHref, onSettings,
       </div>
       <div className="cw-header-right">
         {app === null ? (
-          <Button variant="ghost" href={household} icon={<Users size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}>
-            Household
-          </Button>
+          household && (
+            <Button variant="ghost" href={household} icon={<Users size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />}>
+              Household
+            </Button>
+          )
         ) : (
           <>
             {actions && (
@@ -165,7 +167,7 @@ interface AccountMenuProps {
   theme?: { value: Theme; onChange: (theme: Theme) => void };
   settingsHref?: string;
   onSettings?: () => void;
-  householdHref: string;
+  householdHref: string | null;
   logout?: LogoutAction;
 }
 
@@ -241,10 +243,12 @@ function AccountMenu({ account, theme, settingsHref, onSettings, householdHref, 
               <div className="cw-menu-divider" role="separator" />
             </>
           )}
-          <a className="cw-menu-item" role="menuitem" href={householdHref}>
-            <House size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
-            <span className="cw-menu-item-label">Household</span>
-          </a>
+          {householdHref && (
+            <a className="cw-menu-item" role="menuitem" href={householdHref}>
+              <House size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              <span className="cw-menu-item-label">Household</span>
+            </a>
+          )}
           {settingsItem}
           {logout && (
             <>
