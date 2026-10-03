@@ -5,11 +5,12 @@
 
    Themes: light is the default. Dark applies when <html data-theme="dark">
    (every app's theme script sets that attribute), and also for the legacy
-   <html class="dark"> that home.cornerways still sets until it moves over. */
+   <html class="dark"> that home.cornerways still sets until it moves over.
+   color-scheme is left to each app for now: the shell will own it once the
+   per-app token blocks go (Step 3 onward), not before, so importing this
+   file stays invisible. */
 
 :root {
-  color-scheme: light;
-
   /* Neutral canvas and surfaces */
   --cw-canvas: #f6f4f0;
   --cw-header-surface: #fbfaf8;
@@ -75,8 +76,6 @@
 
 :root[data-theme="dark"],
 :root.dark {
-  color-scheme: dark;
-
   --cw-canvas: #1a1816;
   --cw-header-surface: #201d1a;
   --cw-surface: #262320;
