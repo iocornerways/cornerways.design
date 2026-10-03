@@ -1,0 +1,602 @@
+/* Cornerways shared components.
+   Header, controls, toolbar and footer, styled once from the tokens. Every
+   class is namespaced .cw-* so this file is inert until a page uses them. */
+
+/* ---------- Header ---------- */
+
+.cw-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--cw-z-header);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--cw-header-h);
+  padding-inline: var(--cw-gutter);
+  background: var(--cw-header-surface);
+  border-bottom: 1px solid var(--cw-border-soft);
+  color: var(--cw-ink);
+  font-family: var(--cw-font-ui);
+  font-size: 14px;
+}
+
+.cw-header *,
+.cw-menu *,
+.cw-toolbar *,
+.cw-footer * {
+  box-sizing: border-box;
+}
+
+.cw-header-left,
+.cw-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cw-header-right {
+  flex-shrink: 0;
+}
+
+.cw-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--cw-control-h);
+  padding-inline: 4px;
+  margin-inline-start: -4px;
+  border-radius: var(--cw-radius-control);
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cw-brand-mark {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  color: var(--cw-ink);
+}
+
+.cw-brand-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cw-wordmark {
+  font-family: var(--cw-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.cw-crumb-sep {
+  color: var(--cw-border);
+  font-size: 18px;
+  line-height: 1;
+  user-select: none;
+}
+
+.cw-app-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--cw-control-h);
+  padding: 0 6px 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--cw-radius-control);
+  background: transparent;
+  color: var(--cw-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--cw-ease), border-color var(--cw-ease);
+}
+
+.cw-app-switcher:hover,
+.cw-app-switcher[aria-expanded="true"] {
+  background: var(--cw-canvas);
+  border-color: var(--cw-border-soft);
+}
+
+.cw-app-switcher svg {
+  color: var(--cw-muted);
+  flex-shrink: 0;
+}
+
+.cw-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cw-header-divider {
+  width: 1px;
+  height: 24px;
+  margin-inline: 4px;
+  background: var(--cw-border-soft);
+}
+
+/* Below 640px the wordmark and the slash step aside for the app name. */
+@media (max-width: 639.98px) {
+  .cw-header .cw-wordmark,
+  .cw-header .cw-crumb-sep {
+    display: none;
+  }
+
+  .cw-header .cw-brand {
+    gap: 0;
+  }
+
+  .cw-account-name {
+    display: none;
+  }
+}
+
+/* ---------- Account menu ---------- */
+
+.cw-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--cw-control-h);
+  padding: 0 8px 0 5px;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-control);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--cw-ease), background-color var(--cw-ease);
+}
+
+.cw-account:hover,
+.cw-account[aria-expanded="true"] {
+  border-color: var(--cw-muted);
+}
+
+.cw-account svg {
+  color: var(--cw-muted);
+  flex-shrink: 0;
+}
+
+.cw-account--anonymous {
+  width: var(--cw-control-h);
+  padding: 0;
+  justify-content: center;
+}
+
+.cw-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cw-muted);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.cw-avatar--lg {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+/* ---------- Menus (shared by the switcher and the account menu) ---------- */
+
+.cw-menu-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.cw-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  z-index: var(--cw-z-menu);
+  min-width: 240px;
+  padding: 6px;
+  border: 1px solid var(--cw-border-soft);
+  border-radius: var(--cw-radius-card);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  box-shadow: var(--cw-shadow-2);
+  font-family: var(--cw-font-ui);
+  font-size: 14px;
+}
+
+.cw-menu--start {
+  left: 0;
+}
+
+.cw-menu--end {
+  right: 0;
+}
+
+.cw-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--cw-control-h);
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--cw-ink);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--cw-ease);
+}
+
+.cw-menu-item:hover,
+.cw-menu-item:focus-visible {
+  background: var(--cw-canvas);
+  outline: none;
+}
+
+.cw-menu-item > svg {
+  color: var(--cw-muted);
+  flex-shrink: 0;
+}
+
+.cw-menu-item-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.cw-menu-item-check {
+  color: var(--cw-brand-text);
+}
+
+.cw-menu-item--muted {
+  color: var(--cw-muted);
+}
+
+.cw-menu-divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--cw-border-softer);
+}
+
+.cw-menu-section {
+  padding: 8px 10px 4px;
+  color: var(--cw-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cw-menu-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 10px;
+}
+
+.cw-menu-identity-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.cw-menu-identity-sub {
+  color: var(--cw-muted);
+  font-size: 12.5px;
+}
+
+.cw-menu .cw-segmented {
+  margin: 0 10px 8px;
+  width: calc(100% - 20px);
+}
+
+.cw-app-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--cw-app-accent, var(--cw-brand)) 10%, transparent);
+  color: var(--cw-app-accent, var(--cw-brand));
+  flex-shrink: 0;
+}
+
+.cw-app-chip--lg {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+/* ---------- Buttons ---------- */
+
+.cw-button,
+.cw-icon-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--cw-control-h);
+  padding: 0 14px;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-control);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font-family: var(--cw-font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--cw-ease), border-color var(--cw-ease), color var(--cw-ease);
+}
+
+.cw-button:hover,
+.cw-icon-button:hover {
+  border-color: var(--cw-muted);
+}
+
+.cw-button:disabled,
+.cw-icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cw-button > svg,
+.cw-icon-button > svg {
+  flex-shrink: 0;
+}
+
+.cw-button--primary {
+  border-color: var(--cw-brand);
+  background: var(--cw-brand);
+  color: var(--cw-brand-ink);
+  font-weight: 600;
+}
+
+.cw-button--primary:hover {
+  border-color: var(--cw-brand-hover);
+  background: var(--cw-brand-hover);
+}
+
+.cw-button--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--cw-ink);
+}
+
+.cw-button--ghost:hover {
+  border-color: transparent;
+  background: var(--cw-canvas);
+}
+
+.cw-icon-button {
+  width: var(--cw-control-h);
+  padding: 0;
+  background: var(--cw-header-surface);
+  color: var(--cw-muted);
+}
+
+.cw-icon-button:hover {
+  color: var(--cw-ink);
+}
+
+.cw-icon-button--active,
+.cw-icon-button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--cw-brand) 40%, transparent);
+  background: var(--cw-brand-soft);
+  color: var(--cw-brand-text);
+}
+
+/* ---------- Filter pill ---------- */
+
+.cw-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--cw-control-h);
+  padding: 0 14px;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-pill);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font-family: var(--cw-font-ui);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--cw-ease), border-color var(--cw-ease), color var(--cw-ease);
+}
+
+.cw-pill:hover {
+  border-color: var(--cw-muted);
+}
+
+.cw-pill--active,
+.cw-pill[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--cw-brand) 40%, transparent);
+  background: var(--cw-brand-soft);
+  color: var(--cw-brand-text);
+}
+
+.cw-pill-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------- Segmented control ---------- */
+
+.cw-segmented {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: stretch;
+  height: var(--cw-control-h);
+  padding: 3px;
+  border-radius: var(--cw-radius-control);
+  background: var(--cw-border-softer);
+  font-family: var(--cw-font-ui);
+}
+
+.cw-segmented--sm {
+  height: 34px;
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.cw-segment {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: calc(var(--cw-radius-control) - 3px);
+  background: transparent;
+  color: var(--cw-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--cw-ease), color var(--cw-ease), box-shadow var(--cw-ease);
+}
+
+.cw-segmented--sm .cw-segment {
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.cw-segment:hover {
+  color: var(--cw-ink);
+}
+
+.cw-segment[aria-pressed="true"] {
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font-weight: 600;
+  box-shadow: var(--cw-shadow-1);
+}
+
+.cw-segment:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- Toolbar row ---------- */
+
+.cw-toolbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--cw-toolbar-h);
+  padding-inline: var(--cw-gutter);
+  border-bottom: 1px solid var(--cw-border-soft);
+  background: var(--cw-canvas);
+  color: var(--cw-ink);
+  font-family: var(--cw-font-ui);
+}
+
+.cw-toolbar-start,
+.cw-toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cw-toolbar-start {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cw-toolbar-start::-webkit-scrollbar {
+  display: none;
+}
+
+.cw-toolbar-end {
+  flex-shrink: 0;
+}
+
+.cw-toolbar-divider {
+  width: 1px;
+  height: 24px;
+  margin-inline: 4px;
+  background: var(--cw-border-soft);
+  flex-shrink: 0;
+}
+
+/* ---------- Footer (reading pages) ---------- */
+
+.cw-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 24px 32px;
+  border-top: 1px solid var(--cw-border-softer);
+  color: var(--cw-muted);
+  font-family: var(--cw-font-ui);
+  font-size: 13px;
+}
+
+.cw-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cw-footer a:hover {
+  color: var(--cw-ink);
+}
+
+/* ---------- Focus ---------- */
+
+.cw-header :focus-visible,
+.cw-menu :focus-visible,
+.cw-button:focus-visible,
+.cw-icon-button:focus-visible,
+.cw-pill:focus-visible,
+.cw-segment:focus-visible {
+  outline: none;
+  box-shadow: var(--cw-focus-ring);
+}
+
+.cw-menu-item:focus-visible {
+  box-shadow: none;
+}
+
+.cw-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

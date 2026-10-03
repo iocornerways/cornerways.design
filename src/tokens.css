@@ -8,9 +8,13 @@
    <html class="dark"> that home.cornerways still sets until it moves over.
    color-scheme is left to each app for now: the shell will own it once the
    per-app token blocks go (Step 3 onward), not before, so importing this
-   file stays invisible. */
+   file stays invisible.
 
-:root {
+   [data-cw-theme="light|dark"] scopes a theme to one subtree — for a preview
+   that shows both at once, or a deliberately dark panel on a light page. */
+
+:root,
+[data-cw-theme="light"] {
   /* Neutral canvas and surfaces */
   --cw-canvas: #f6f4f0;
   --cw-header-surface: #fbfaf8;
@@ -43,7 +47,11 @@
   --cw-shadow-2: 0 8px 24px rgb(31 29 26 / 0.12);
   --cw-shadow-3: 0 16px 40px rgb(31 29 26 / 0.16);
   --cw-focus-ring: 0 0 0 3px color-mix(in srgb, var(--cw-brand) 28%, transparent);
+}
 
+/* Theme-independent: layout, shape, icons, stacking, motion. Only on :root so
+   a themed island inherits them unchanged. */
+:root {
   /* Layout */
   --cw-gutter: 16px;
   --cw-reading-width: 880px;
@@ -75,7 +83,8 @@
 }
 
 :root[data-theme="dark"],
-:root.dark {
+:root.dark,
+[data-cw-theme="dark"] {
   --cw-canvas: #1a1816;
   --cw-header-surface: #201d1a;
   --cw-surface: #262320;

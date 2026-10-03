@@ -38,9 +38,47 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `src/fonts.css`, `src/fonts.ts` | Font-family tokens for Figtree (UI) and Source Serif 4 (display) with system-ui and Georgia fallbacks, and the Google Fonts href |
 | `src/tokens.css` | Colours (light and dark), per-app accents, sizes, radii, shadows, z-index |
 | `src/base.css` | `.cw-workspace` and `.cw-reading` layout wrappers |
-| `src/apps.ts` | The app list: names, hosts, dev ports, accents, layout mode |
+| `src/components.css` | Styles for the header, menus, buttons, pills, segmented control, toolbar and footer (`.cw-*`) |
+| `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
 | `src/layout.tsx` | `<Workspace>` and `<Reading>` components |
-| `preview-site/` | Token specimen page, both themes: `npm run preview` (serves the repo root and opens `/preview-site/`) |
+| `src/Header.tsx` | `<Header>`: breadcrumb app switcher, page-actions slot, account menu |
+| `src/controls.tsx` | `<Button>`, `<IconButton>`, `<Pill>`, `<Segmented>`, `<Toolbar>`, `<Footer>` |
+| `preview-site/` | Every component in both themes plus a 390px frame: `npm run preview` |
+
+## Components
+
+```tsx
+import { Header, Toolbar, Segmented, Button, IconButton, Pill, Footer, Workspace } from "@cornerways/design";
+import { useTheme } from "./hooks/useTheme.ts";
+
+const { theme, setTheme } = useTheme();
+
+<Header
+  app="calendar"                               // null renders the hub variant
+  account={{ name: "Dave", color: "#4c8bf5" }} // null: menu without identity; omit: no menu
+  theme={{ value: theme, onChange: setTheme }}
+  settingsHref="/settings" onSettings={() => navigate("/settings")}
+  logout={{ formAction: "/logout" }}           // or { onSelect: () => … }
+  actions={<IconButton label="Meetups"><Users size={18} strokeWidth={1.7} /></IconButton>}
+/>
+<Toolbar end={<Button variant="primary" icon={<Plus size={18} strokeWidth={1.7} />}>Add entry</Button>}>
+  <Segmented label="View" value={view} onChange={setView} options={[{ value: "month", label: "Month" }]} />
+  <Pill active={all} onClick={…}>Everyone</Pill>
+</Toolbar>
+<Workspace as="main">…</Workspace>
+```
+
+- **Header.** Left: mark + wordmark (to the hub), `/`, the app name. The app name opens the switcher: every app from `APPS` with its icon chip in its accent, the current one ticked, "All apps overview" at the bottom. Right: the `actions` slot, a divider when there are actions, then the account menu with avatar and name, Theme (Light / Dark / Auto), Household, Settings and Log out. Below 640px the wordmark, slash and account name hide. `app={null}` gives the hub's header: mark, wordmark and a Household button.
+- **Buttons.** `variant="primary"` is terracotta with white text: one per page. `secondary` (default) is bordered. `ghost` is quiet. All 40px tall, radius 10. `<IconButton>` is 40×40 and takes `active` for a toggle that is on.
+- **Pill.** Fully rounded filter toggle, 40px, optional colour `dot`.
+- **Segmented.** Grey track, white active segment; `size="sm"` for inside menus. Options can be `disabled` with a `title`.
+- **Toolbar.** The 60px row under the header, same gutter; children start left, `end` pins right. `<ToolbarDivider />` between groups.
+- **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default.
+- **Icons.** lucide-react at `ICON_STROKE` (1.7), 18px in controls. `APP_ICONS[key]` is the app's line icon.
+
+## Consuming the TSX from an app
+
+The package ships source, not a build. While it is a `file:` link, the app's Vite needs `resolve.dedupe: ["react", "react-dom", "lucide-react"]` so the linked source resolves React from the app, not from this repo's `node_modules`. A git dependency has no such need.
 
 ## Layout modes
 

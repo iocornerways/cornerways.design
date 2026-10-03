@@ -3,69 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cornerways tokens</title>
+<title>Cornerways shell preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/src/styles.css" />
-<style>
-  body { margin: 0; font-family: var(--cw-font-ui); color: var(--cw-ink); background: var(--cw-canvas); }
-  .bar { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; height: var(--cw-header-h); padding-inline: var(--cw-gutter); background: var(--cw-header-surface); border-bottom: 1px solid var(--cw-border-soft); }
-  .bar strong { font-family: var(--cw-font-display); font-weight: 600; font-size: 18px; }
-  .bar button { height: var(--cw-control-h); padding: 0 14px; border: 1px solid var(--cw-border); border-radius: var(--cw-radius-control); background: var(--cw-surface); color: var(--cw-ink); font: inherit; cursor: pointer; }
-  main { padding-block: 32px; }
-  h1 { font-family: var(--cw-font-display); font-weight: 600; font-size: 28px; margin: 0 0 4px; }
-  h2 { font-family: var(--cw-font-display); font-weight: 600; font-size: 20px; margin: 32px 0 12px; }
-  p { color: var(--cw-muted); margin: 0 0 16px; }
-  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-  .swatch { border: 1px solid var(--cw-border-soft); border-radius: var(--cw-radius-card); background: var(--cw-surface); overflow: hidden; box-shadow: var(--cw-shadow-1); }
-  .swatch i { display: block; height: 56px; }
-  .swatch b { display: block; padding: 8px 10px 0; font-size: 13px; font-weight: 600; }
-  .swatch code { display: block; padding: 0 10px 10px; font: 12px var(--cw-font-mono); color: var(--cw-muted); }
-  .type > div { padding: 10px 0; border-bottom: 1px solid var(--cw-border-softer); }
-  .mode { border: 1px dashed var(--cw-border); border-radius: var(--cw-radius-card); padding: 12px 0; margin-bottom: 12px; }
-  .mode > div { background: var(--cw-brand-soft); border: 1px solid var(--cw-brand); border-radius: 6px; padding: 10px; font-size: 13px; }
-</style>
 </head>
 <body>
-<div class="bar"><strong>Cornerways tokens</strong><button id="theme" type="button">Toggle theme</button></div>
-<main class="cw-reading">
-  <h1>Design tokens</h1>
-  <p>Every value the shared shell uses. Toggle the theme to review the proposed dark set.</p>
-
-  <h2>Neutrals</h2>
-  <div class="swatches" id="neutrals"></div>
-
-  <h2>Brand and app accents</h2>
-  <div class="swatches" id="accents"></div>
-
-  <h2>Type</h2>
-  <div class="type">
-    <div style="font-family:var(--cw-font-display);font-size:28px;font-weight:600">Source Serif 4 — headings, wordmark, page titles</div>
-    <div style="font-size:16px">Figtree 400 — body text. The quick brown fox jumps over the lazy dog.</div>
-    <div style="font-size:14px;font-weight:500">Figtree 500 — controls and labels</div>
-    <div style="font-size:14px;font-weight:600">Figtree 600 — emphasis</div>
-    <div style="font-size:12px;color:var(--cw-muted)">Figtree 12px muted — captions and meta</div>
-  </div>
-
-  <h2>Layout modes</h2>
-  <p>This page is a Reading column (880px). The box below is a Workspace block inside it, for scale.</p>
-  <div class="mode cw-workspace"><div>Workspace: full width, padded by the gutter (24px, 16px on phones)</div></div>
-</main>
-<script>
-  const tokens = {
-    neutrals: ['canvas','header-surface','surface','border','border-soft','border-softer','ink','muted'],
-    accents: ['brand','brand-text','accent-home','accent-calendar','accent-todo','accent-weather','accent-trips','accent-trains','accent-food','accent-finance'],
-  };
-  function render() {
-    const cs = getComputedStyle(document.documentElement);
-    for (const [id, names] of Object.entries(tokens)) {
-      document.getElementById(id).innerHTML = names.map((n) => `<div class="swatch"><i style="background:var(--cw-${n})"></i><b>--cw-${n}</b><code>${cs.getPropertyValue('--cw-' + n).trim()}</code></div>`).join('');
-    }
-  }
-  const root = document.documentElement;
-  document.getElementById('theme').onclick = () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; render(); };
-  render();
-</script>
+<div id="root"></div>
+<script type="module" src="./main.tsx"></script>
 </body>
 </html>
