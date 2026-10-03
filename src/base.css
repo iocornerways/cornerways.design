@@ -1,0 +1,28 @@
+/* Cornerways layout modes.
+   Two ways a page sits under the full-width header:
+
+   Workspace — content runs the full width, aligned to the header's gutter.
+   Reading   — a centred column of --cw-reading-width, also aligned to the
+               gutter when the viewport is narrower than the column.
+
+   Nothing here styles body, * or any element an app already owns, so
+   importing it changes nothing until a page opts in with these classes. */
+
+.cw-workspace {
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--cw-gutter);
+}
+
+/* A Workspace page whose content is edge to edge (the Trips map). */
+.cw-workspace--flush {
+  padding-inline: 0;
+}
+
+.cw-reading {
+  width: 100%;
+  min-width: 0;
+  max-width: calc(var(--cw-reading-width) + 2 * var(--cw-gutter));
+  margin-inline: auto;
+  padding-inline: var(--cw-gutter);
+}
