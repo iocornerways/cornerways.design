@@ -210,7 +210,7 @@
   padding: 6px;
   border: 1px solid var(--cw-border-soft);
   border-radius: var(--cw-radius-card);
-  background: var(--cw-surface);
+  background: var(--cw-surface-raised);
   color: var(--cw-ink);
   box-shadow: var(--cw-shadow-2);
   font-family: var(--cw-font-ui);

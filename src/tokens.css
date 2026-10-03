@@ -19,6 +19,7 @@
   --cw-canvas: #f6f4f0;
   --cw-header-surface: #fbfaf8;
   --cw-surface: #ffffff;
+  --cw-surface-raised: #ffffff;
   --cw-border: #ddd9d2;
   --cw-border-soft: #e4e0d9;
   --cw-border-softer: #ece9e3;
@@ -88,6 +89,7 @@
   --cw-canvas: #1a1816;
   --cw-header-surface: #201d1a;
   --cw-surface: #262320;
+  --cw-surface-raised: #2d2a26;
   --cw-border: #3b3630;
   --cw-border-soft: #34302b;
   --cw-border-softer: #2d2a26;
