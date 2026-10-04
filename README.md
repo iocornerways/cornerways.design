@@ -74,7 +74,7 @@ const { theme, setTheme } = useTheme();
 - **Segmented.** Grey track, white active segment; `size="sm"` for inside menus. Options can be `disabled` with a `title`.
 - **Toolbar.** The 60px row under the header, same gutter; children start left, `end` pins right. `<ToolbarDivider />` between groups.
 - **SegmentedMulti.** The same track with any number of segments on at once, for filters (people, statuses); options take an optional colour `dot`.
-- **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default.
+- **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default; hidden below 640px.
 - **Icons.** lucide-react at `ICON_STROKE` (1.7), 18px in controls. `APP_ICONS[key]` is the app's line icon.
 
 ## Consuming the TSX from an app

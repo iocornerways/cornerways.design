@@ -600,6 +600,15 @@
   color: var(--cw-ink);
 }
 
+/* On a phone the footer is in the way more than it's read: pinned under a
+   map or a board it steals a row, and inside a scroller it lands between
+   content and a fixed action bar. Phones go without it. */
+@media (max-width: 639.98px) {
+  .cw-footer {
+    display: none;
+  }
+}
+
 /* ---------- Focus ---------- */
 
 .cw-header :focus-visible,
