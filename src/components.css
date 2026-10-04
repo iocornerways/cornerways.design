@@ -454,11 +454,32 @@
   box-sizing: border-box;
   display: inline-flex;
   align-items: stretch;
+  gap: 2px;
   height: var(--cw-control-h);
   padding: 3px;
   border-radius: var(--cw-radius-control);
   background: var(--cw-border-softer);
   font-family: var(--cw-font-ui);
+  flex-shrink: 0;
+}
+
+/* A multi-select track can be long (one segment per person); it scrolls
+   sideways inside a tight parent rather than wrapping or overflowing. */
+.cw-segmented--multi {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cw-segmented--multi::-webkit-scrollbar {
+  display: none;
+}
+
+.cw-segment-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .cw-segmented--sm {

@@ -99,6 +99,8 @@ export interface SegmentedOption<T extends string> {
   disabled?: boolean;
   /** Why it's disabled, shown on hover. */
   title?: string;
+  /** A colour dot before the label, for a person or category. */
+  dot?: string;
 }
 
 interface SegmentedProps<T extends string> {
@@ -126,6 +128,44 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
           title={option.title}
           onClick={() => onChange(option.value)}
         >
+          {option.dot && <span className="cw-segment-dot" style={{ background: option.dot }} aria-hidden="true" />}
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+interface SegmentedMultiProps<T extends string> {
+  options: readonly SegmentedOption<T>[];
+  /** The segments currently on. Which combinations are allowed is the caller's business. */
+  values: readonly T[];
+  onToggle: (value: T) => void;
+  /** What the group filters, for assistive tech. */
+  label: string;
+  size?: "md" | "sm";
+  className?: string;
+  style?: CSSProperties;
+}
+
+/**
+ * The same grey track, but any number of segments can be on at once — a
+ * filter rather than a choice. Each segment is a pressed/unpressed toggle.
+ */
+export function SegmentedMulti<T extends string>({ options, values, onToggle, label, size = "md", className, style }: SegmentedMultiProps<T>) {
+  return (
+    <div className={join("cw-segmented", "cw-segmented--multi", size === "sm" && "cw-segmented--sm", className)} role="group" aria-label={label} style={style}>
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          className="cw-segment"
+          aria-pressed={values.includes(option.value)}
+          disabled={option.disabled}
+          title={option.title}
+          onClick={() => onToggle(option.value)}
+        >
+          {option.dot && <span className="cw-segment-dot" style={{ background: option.dot }} aria-hidden="true" />}
           {option.label}
         </button>
       ))}

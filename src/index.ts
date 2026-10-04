@@ -4,7 +4,7 @@ export { Reading, Workspace } from "./layout.tsx";
 export { FONT_PRECONNECT_ORIGINS, GOOGLE_FONTS_HREF } from "./fonts.ts";
 export { Header } from "./Header.tsx";
 export type { AccountIdentity, HeaderProps, LogoutAction } from "./Header.tsx";
-export { Button, Footer, IconButton, Pill, Segmented, Toolbar, ToolbarDivider } from "./controls.tsx";
+export { Button, Footer, IconButton, Pill, Segmented, SegmentedMulti, Toolbar, ToolbarDivider } from "./controls.tsx";
 export type { SegmentedOption } from "./controls.tsx";
 export { APP_ICONS, ICON_STROKE } from "./icons.tsx";
 export { Mark } from "./Mark.tsx";
