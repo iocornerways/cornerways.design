@@ -584,7 +584,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-block: 24px 32px;
+  padding-block: 14px 18px;
   border-top: 1px solid var(--cw-border-softer);
   color: var(--cw-muted);
   font-family: var(--cw-font-ui);
