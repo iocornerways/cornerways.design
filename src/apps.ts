@@ -82,3 +82,18 @@ export function hubUrl(currentHostname: string): string {
   if (deployment === "test") return `https://test.${HUB_HOST}`;
   return `https://${HUB_HOST}`;
 }
+
+/**
+ * Every hostname in the family, production and test: the hub (with www) and
+ * each app on *.cornerways.io. Where the hub may send someone back to after
+ * sign-in, and which sites may make changes on the hub (see
+ * @cornerways/design/auth's originGuard). External apps aren't included.
+ */
+export function familyHosts(): string[] {
+  const hosts = [HUB_HOST, `www.${HUB_HOST}`, `test.${HUB_HOST}`];
+  for (const app of APPS) {
+    if (app.external) continue;
+    hosts.push(app.host, `test.${app.host}`);
+  }
+  return hosts;
+}
