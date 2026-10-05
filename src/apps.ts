@@ -97,3 +97,11 @@ export function familyHosts(): string[] {
   }
   return hosts;
 }
+
+/**
+ * The apps a household can have switched on (app_grants on the hub): every
+ * family app on *.cornerways.io except hidden ones like Mission Control.
+ */
+export function householdAppKeys(): AppKey[] {
+  return APPS.filter((app) => !app.external && !app.hidden).map((app) => app.key);
+}

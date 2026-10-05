@@ -19,7 +19,7 @@
  */
 import type { Context, MiddlewareHandler } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { familyHosts } from "./apps.ts";
+import { APPS, familyHosts, householdAppKeys } from "./apps.ts";
 
 /** What a Worker needs in its env for any of this. */
 export type AuthEnv = {
@@ -54,8 +54,20 @@ export type SessionPayload = {
 /** Who a session belongs to right now, from the hub's database. */
 export type LiveSession = { role: string; scope: string };
 
-/** The hub's answer to "who is this cookie?": the session as it stands now, and a renewed cookie when one is due. */
-export type SessionCheck = { session: SessionPayload; token?: string };
+/**
+ * The hub's answer to "who is this cookie?": the household-level session as
+ * it stands now (what the cookie carries), their role and scope in the app
+ * that asked, when it named one, and a renewed cookie when one is due.
+ */
+export type SessionCheck = { session: SessionPayload; app?: LiveSession; token?: string };
+
+/**
+ * The hub's lookup behind a check: the household-level role and scope (null
+ * if removed or revoked), and, when an app is named, the effective role and
+ * scope in that app: "none" if the app isn't switched on for the household,
+ * otherwise the member's per-app override or else their household role.
+ */
+export type LiveLookup = (memberId: string, householdId: string, app?: string) => Promise<{ household: LiveSession; app?: LiveSession } | null>;
 
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days, renewed at most daily
 const RENEW_AFTER_SECONDS = 60 * 60 * 24;
@@ -259,23 +271,20 @@ export async function readSession(c: AuthContext): Promise<SessionPayload | null
  * or scope has changed. null if the cookie is invalid or the person has been
  * removed or the device revoked.
  */
-export async function checkSessionToken(
-  env: AuthEnv,
-  token: string,
-  live: (memberId: string, householdId: string) => Promise<LiveSession | null>,
-): Promise<SessionCheck | null> {
+export async function checkSessionToken(env: AuthEnv, token: string, live: LiveLookup, app?: string): Promise<SessionCheck | null> {
   const signed = await verifySessionToken(env, token);
   const session = signed ?? (await verifyLegacyToken(env, token));
   if (!session) return null;
-  const current = await live(session.memberId, session.householdId);
-  if (!current) return null;
+  const found = await live(session.memberId, session.householdId, app);
+  if (!found) return null;
+  const current = found.household;
 
   const now = Math.floor(Date.now() / 1000);
   const changed = current.role !== session.role || current.scope !== session.scope;
   const due = !signed || changed || session.exp - now < SESSION_MAX_AGE_SECONDS - RENEW_AFTER_SECONDS;
   const updated = { memberId: session.memberId, householdId: session.householdId, role: current.role, scope: current.scope };
-  if (!due) return { session: { ...updated, exp: session.exp } };
-  return { session: { ...updated, exp: now + SESSION_MAX_AGE_SECONDS }, token: await signSession(env, updated) };
+  if (!due) return { session: { ...updated, exp: session.exp }, app: found.app };
+  return { session: { ...updated, exp: now + SESSION_MAX_AGE_SECONDS }, app: found.app, token: await signSession(env, updated) };
 }
 
 // ---------- authenticate ----------
@@ -283,8 +292,9 @@ export async function checkSessionToken(
 export type AuthenticateOptions = {
   /**
    * Sends the session cookie to the hub and returns its answer: apps pass
-   * their HOUSEHOLD binding's checkSession; the hub calls checkSessionToken
-   * itself.
+   * their HOUSEHOLD binding's checkSession with their own app key, e.g.
+   * (token) => c.env.HOUSEHOLD.checkSession(token, "todo"); the hub calls
+   * checkSessionToken itself.
    */
   check: (token: string) => Promise<SessionCheck | null>;
   /** How long an answer is reused in this isolate. Default 60; the hub uses 0. */
@@ -339,7 +349,11 @@ export async function authenticate(c: AuthContext, options: AuthenticateOptions)
     return null;
   }
   if (result.token) writeSessionCookie(c, result.token);
-  return result.session;
+  // The cookie keeps the household-level role (it's shared by every app);
+  // this request works with the role in this app, when the hub gave one.
+  // "No access to this app" is role "none" here, so roleGate answers 403
+  // in this app only, rather than signing anyone out everywhere.
+  return result.app ? { ...result.session, role: result.app.role, scope: result.app.scope } : result.session;
 }
 
 // ---------- Cross-site write guard ----------
@@ -388,23 +402,49 @@ export function originGuard(options: OriginGuardOptions = {}): MiddlewareHandler
   };
 }
 
-export { familyHosts };
+export { APPS, familyHosts, householdAppKeys };
 
 // ---------- Roles ----------
 // owner / editor / viewer / none (docs/household-platform.md §05 in the
 // cornerways repo). No app has per-app overrides yet, so the household role
 // is the effective role everywhere.
 
+/** A paired kiosk tablet, signed in as itself rather than as a person (see the hub's device pairing). */
+export function isDevice(session: { memberId: string }): boolean {
+  return session.memberId.startsWith("dev_");
+}
+
 /**
- * Blocks a request outright on role, before any route logic runs. `none` has
- * no access; `viewer` is read-only, except for a `personalWrite`: a request
- * that can only change the caller's own answer about themselves (calendar's
- * meetup availability). Returns an error message, or null to allow it.
+ * What a paired tablet may do in an app. Every app declares one, in its
+ * auth gate: "read-only" (a tablet is a household-wide viewer, the default
+ * meaning of its role) or "full" (it may change things too, as on home,
+ * where the kitchen tablet is how people switch the lights and heating).
  */
-export function roleGate(role: string, method: string, personalWrite = false): string | null {
-  if (role === "none") return "No access to this app";
-  if (role === "viewer" && !personalWrite && method !== "GET" && method !== "HEAD") return "Read-only access";
-  return null;
+export type DevicePolicy = "read-only" | "full";
+
+export type RoleGateOptions = {
+  /** This app's device policy; see DevicePolicy. */
+  devices: DevicePolicy;
+  /**
+   * A request that can only change the caller's own answer about themselves
+   * (calendar's meetup availability): allowed for a viewer, since being
+   * signed in shouldn't buy less than an anonymous guest with the link.
+   */
+  personalWrite?: boolean;
+};
+
+/**
+ * Blocks a request outright on role, before any route logic runs: `none`
+ * has no access; `viewer` is read-only unless it's a personalWrite, or a
+ * device in an app whose policy is "full". Returns an error message, or
+ * null to allow it.
+ */
+export function roleGate(session: { role: string; memberId: string }, method: string, options: RoleGateOptions): string | null {
+  if (session.role === "none") return "No access to this app";
+  const reading = method === "GET" || method === "HEAD";
+  if (session.role !== "viewer" || reading || options.personalWrite) return null;
+  if (isDevice(session) && options.devices === "full") return null;
+  return "Read-only access";
 }
 
 /** Whether a session sees the whole household's member-tagged data rather than just its own. Owner always does. */
