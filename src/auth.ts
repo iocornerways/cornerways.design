@@ -356,6 +356,37 @@ export async function authenticate(c: AuthContext, options: AuthenticateOptions)
   return result.app ? { ...result.session, role: result.app.role, scope: result.app.scope } : result.session;
 }
 
+// ---------- No access ----------
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/**
+ * The page a signed-in person sees when opening an app they have no access
+ * to (role "none" here: the app isn't switched on for their household, or
+ * an owner has turned it off for them). Self-contained, so it renders even
+ * where the app's own page can't. A 403, never a sign-out.
+ */
+export function noAccessPage(c: AuthContext, appName: string): Response {
+  const hub = hubOrigin(c.env as AuthEnv, c.req.url);
+  return c.html(
+    `<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${escapeHtml(appName)}</title>
+<style>
+  body { font-family: Figtree, system-ui, sans-serif; max-width: 30rem; margin: 18vh auto; padding: 0 1.5rem; line-height: 1.55; color: #1f1d1a; background: #f6f4f0; }
+  @media (prefers-color-scheme: dark) { body { color: #f1ede7; background: #1a1816; } a.button { color: #fff; } }
+  h1 { font-size: 1.6rem; margin: 0 0 .5rem; }
+  a.button { display: inline-block; margin-top: 1rem; padding: .7rem 1.2rem; border-radius: 10px; background: #b4401e; color: #fff; text-decoration: none; font-weight: 600; }
+</style></head>
+<body><h1>You don't have access to ${escapeHtml(appName)}</h1>
+<p>${escapeHtml(appName)} isn't switched on for you. A household owner can change that on the household page.</p>
+<a class="button" href="${hub}/">Back to Cornerways</a></body></html>`,
+    403,
+  );
+}
+
 // ---------- Cross-site write guard ----------
 
 function isDevHost(hostname: string): boolean {
