@@ -53,6 +53,13 @@ export type TelemetryOptions = {
   /** Who made the request, read after the handler runs. */
   actor: (c: Context<any>) => Actor | null | undefined | Promise<Actor | null | undefined>;
   environment: (c: Context<any>) => string | undefined;
+  /**
+   * Requests not to record at all, checked before the handler runs. For
+   * background polls that would swamp the free plan's 100,000 points a day
+   * and say nothing about usage (a kiosk asking for commands every 10s, a
+   * dashboard refreshing every few seconds).
+   */
+  skip?: (c: Context<any>) => boolean;
 };
 
 function actorKind(actor: Actor | null | undefined): "member" | "device" | "anon" {
@@ -100,6 +107,29 @@ export function trackEvent(
   track(dataset, app, env, { kind: "event", feature: name.split(".")[0] ?? name, name, actor });
 }
 
+/**
+ * Runs a scheduled job and records one "cron" point for it: status 200 if
+ * it finished, 500 if it threw (then rethrows), plus how long it took. This
+ * is the heartbeat Mission Control's Health page checks.
+ */
+export async function trackCron<T>(
+  dataset: EventsDataset | undefined,
+  app: string,
+  env: string | undefined,
+  name: string,
+  job: () => Promise<T>,
+): Promise<T> {
+  const started = Date.now();
+  let status = 500;
+  try {
+    const result = await job();
+    status = 200;
+    return result;
+  } finally {
+    track(dataset, app, env, { kind: "cron", feature: "cron", name, status, latencyMs: Date.now() - started });
+  }
+}
+
 function featureFor(pathname: string): string {
   const parts = pathname.split("/").filter(Boolean);
   return parts[0] === "api" ? (parts[1] ?? "api") : "page";
@@ -112,6 +142,7 @@ function featureFor(pathname: string): string {
  */
 export function telemetry(options: TelemetryOptions): MiddlewareHandler<any> {
   return async (c, next) => {
+    if (options.skip?.(c)) return next();
     const started = Date.now();
     try {
       await next();
