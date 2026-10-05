@@ -128,7 +128,7 @@ function AppSwitcher({ current, hostname, hub }: { current: AppKey; hostname: st
       </button>
       {menu.open && (
         <div className="cw-menu cw-menu--start" role="menu" aria-label="Apps" onKeyDown={menu.onMenuKeyDown}>
-          {APPS.map((candidate) => {
+          {APPS.filter((candidate) => !candidate.hidden || candidate.key === current).map((candidate) => {
             const Icon = APP_ICONS[candidate.key];
             const isCurrent = candidate.key === current;
             return (

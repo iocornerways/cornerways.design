@@ -158,13 +158,16 @@ export function telemetry(options: TelemetryOptions): MiddlewareHandler<any> {
           actor = null;
         }
         // The pattern the responding route was registered under, so
-        // /api/items/abc and /api/items/xyz count as one route.
-        let pattern = pathname;
+        // /api/items/abc and /api/items/xyz count as one route. A request
+        // only the catch-all answered (a bot probing /api/.env, a typo) is
+        // "(unmatched)" rather than its raw path, so probes can't mint an
+        // endless list of route names.
+        let pattern = "(unmatched)";
         try {
           const registered = routePath(c);
           if (registered && registered !== "*" && registered !== "/*") pattern = registered;
         } catch {
-          // keep the raw path
+          // leave it unmatched
         }
         track(options.dataset(c), options.app, options.environment(c), {
           kind: isApi ? "request" : "page",

@@ -5,7 +5,7 @@
  * is one entry.
  */
 
-export type AppKey = "home" | "calendar" | "todo" | "weather" | "trips" | "trains" | "food" | "finance";
+export type AppKey = "home" | "calendar" | "todo" | "weather" | "trips" | "trains" | "food" | "finance" | "admin";
 
 export type LayoutMode = "workspace" | "reading";
 
@@ -25,6 +25,8 @@ export interface AppDefinition {
   mode: LayoutMode;
   /** True for a site outside *.cornerways.io; it opens with an outward arrow. */
   external?: boolean;
+  /** Left out of the app switcher and hub tiles: an app only a few people can open (Mission Control). */
+  hidden?: boolean;
 }
 
 export const APPS: readonly AppDefinition[] = [
@@ -35,6 +37,7 @@ export const APPS: readonly AppDefinition[] = [
   { key: "trips", name: "Trips", description: "Trip memories, and planning the next one together.", host: "travel.cornerways.io", devPort: 5176, accent: "#b4401e", mode: "workspace" },
   { key: "trains", name: "Trains", description: "Live train times and the daily commute, sorted.", host: "trains.cornerways.io", devPort: 5175, accent: "#2f5fc4", mode: "reading" },
   { key: "food", name: "Food", description: "Weekly meal planning, recipes, and what's in the fridge, freezer and cupboard.", host: "food.cornerways.io", devPort: 5180, accent: "#a33a2a", mode: "workspace" },
+  { key: "admin", name: "Mission Control", description: "Platform usage, households and health, for platform admins.", host: "admin.cornerways.io", devPort: 5181, accent: "#4a5560", mode: "workspace", hidden: true },
   { key: "finance", name: "Finance", description: "Household finances and budgets to help us manage the pennies.", host: "countingthepennies.com", devPort: null, accent: "#2f6b3a", mode: "reading", external: true },
 ];
 

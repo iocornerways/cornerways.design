@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   CloudSun,
+  Gauge,
   Compass,
   House,
   ListChecks,
@@ -21,6 +22,7 @@ export const APP_ICONS: Record<AppKey, LucideIcon> = {
   trains: TrainFront,
   food: UtensilsCrossed,
   finance: PiggyBank,
+  admin: Gauge,
 };
 
 /** Stroke width for every lucide icon in the shell. */
