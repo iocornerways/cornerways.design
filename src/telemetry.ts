@@ -60,6 +60,15 @@ export type TelemetryOptions = {
    * dashboard refreshing every few seconds).
    */
   skip?: (c: Context<any>) => boolean;
+  /**
+   * Which signed-out requests to record. "useful" (the default) keeps only
+   * what tells us something: a signed-out request that reached a real route
+   * or page and succeeded (the weather board, the hub's sign-in steps), or
+   * one that failed with a 5xx. Bot probes of unknown paths, the sign-in
+   * wall's 401s and redirects, and anything announcing itself as a crawler
+   * or script are dropped. "all" records every signed-out request.
+   */
+  anonymous?: "useful" | "all";
 };
 
 function actorKind(actor: Actor | null | undefined): "member" | "device" | "anon" {
@@ -130,9 +139,71 @@ export async function trackCron<T>(
   }
 }
 
+/**
+ * User agents that say they're a crawler, a scanner or a script. Cloudflare's
+ * own bot scoring needs a paid plan; this catches the ones honest enough to
+ * say so (and an empty user agent, which no browser sends).
+ */
+const SELF_DECLARED_BOT =
+  /bot|crawl|spider|slurp|scan|curl|wget|python|httpx|aiohttp|go-http-client|okhttp|java\/|libwww|perl|ruby|php|headless|phantom|scrapy|axios|node-fetch|undici|postman|insomnia|zgrab|masscan|nmap|nuclei|nikto|sqlmap|feed|monitor|uptime|preview/i;
+
+export function isSelfDeclaredBot(userAgent: string | undefined): boolean {
+  return !userAgent || SELF_DECLARED_BOT.test(userAgent);
+}
+
+/** Whether a signed-out request is worth a data point; see TelemetryOptions.anonymous. */
+function keepAnonymous(options: { userAgent: string | undefined; status: number; matched: boolean; isPage: boolean }): boolean {
+  if (isSelfDeclaredBot(options.userAgent)) return false;
+  if (options.status >= 500) return true;
+  if (options.status < 200 || options.status >= 300) return false;
+  return options.matched || options.isPage;
+}
+
 function featureFor(pathname: string): string {
   const parts = pathname.split("/").filter(Boolean);
   return parts[0] === "api" ? (parts[1] ?? "api") : "page";
+}
+
+async function recordRequest(c: Context<any>, options: TelemetryOptions, started: number): Promise<void> {
+  const pathname = new URL(c.req.url).pathname;
+  const isApi = pathname.startsWith("/api/");
+  const isPage = !isApi && c.req.method === "GET" && (c.req.header("accept") ?? "").includes("text/html");
+  if (isApi || isPage) {
+    let actor: Actor | null | undefined = null;
+    try {
+      actor = await options.actor(c);
+    } catch {
+      actor = null;
+    }
+    // The pattern the responding route was registered under, so
+    // /api/items/abc and /api/items/xyz count as one route. A request
+    // only the catch-all answered (a bot probing /api/.env, a typo) is
+    // "(unmatched)" rather than its raw path, so probes can't mint an
+    // endless list of route names.
+    let pattern = "(unmatched)";
+    try {
+      const registered = routePath(c);
+      if (registered && registered !== "*" && registered !== "/*") pattern = registered;
+    } catch {
+      // leave it unmatched
+    }
+    const status = c.res?.status ?? 0;
+    if (
+      !actor &&
+      (options.anonymous ?? "useful") === "useful" &&
+      !keepAnonymous({ userAgent: c.req.header("user-agent"), status, matched: pattern !== "(unmatched)", isPage })
+    ) {
+      return;
+    }
+    track(options.dataset(c), options.app, options.environment(c), {
+      kind: isApi ? "request" : "page",
+      feature: featureFor(pathname),
+      name: isApi ? `${c.req.method} ${pattern}` : "page",
+      actor,
+      status,
+      latencyMs: Date.now() - started,
+    });
+  }
 }
 
 /**
@@ -147,37 +218,7 @@ export function telemetry(options: TelemetryOptions): MiddlewareHandler<any> {
     try {
       await next();
     } finally {
-      const pathname = new URL(c.req.url).pathname;
-      const isApi = pathname.startsWith("/api/");
-      const isPage = !isApi && c.req.method === "GET" && (c.req.header("accept") ?? "").includes("text/html");
-      if (isApi || isPage) {
-        let actor: Actor | null | undefined = null;
-        try {
-          actor = await options.actor(c);
-        } catch {
-          actor = null;
-        }
-        // The pattern the responding route was registered under, so
-        // /api/items/abc and /api/items/xyz count as one route. A request
-        // only the catch-all answered (a bot probing /api/.env, a typo) is
-        // "(unmatched)" rather than its raw path, so probes can't mint an
-        // endless list of route names.
-        let pattern = "(unmatched)";
-        try {
-          const registered = routePath(c);
-          if (registered && registered !== "*" && registered !== "/*") pattern = registered;
-        } catch {
-          // leave it unmatched
-        }
-        track(options.dataset(c), options.app, options.environment(c), {
-          kind: isApi ? "request" : "page",
-          feature: featureFor(pathname),
-          name: isApi ? `${c.req.method} ${pattern}` : "page",
-          actor,
-          status: c.res?.status ?? 0,
-          latencyMs: Date.now() - started,
-        });
-      }
+      await recordRequest(c, options, started).catch((err) => console.warn("telemetry: recording failed", err));
     }
   };
 }
