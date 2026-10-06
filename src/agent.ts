@@ -188,3 +188,22 @@ export async function runAgentTool<Context>(
     return toolError("internal", "Something went wrong running that");
   }
 }
+
+/**
+ * Finds one thing by id, or by name as people say it ("shopping", "the
+ * Shopping list", "dinner"): an exact name first, then a name containing
+ * the words. On a miss or a tie the error names the choices, so the agent
+ * can pick or ask.
+ */
+export function matchByName<T extends { id: string; name: string }>(things: readonly T[], ref: string, noun: string): ToolResult<T> {
+  const byId = things.find((thing) => thing.id === ref);
+  if (byId) return toolOk(byId);
+  const wanted = ref.trim().toLowerCase().replace(/^the\s+/, "").replace(new RegExp(`\\s+${noun}$`), "");
+  const exact = things.filter((thing) => thing.name.trim().toLowerCase() === wanted);
+  const matches = exact.length ? exact : things.filter((thing) => thing.name.toLowerCase().includes(wanted));
+  if (matches.length === 1) return toolOk(matches[0]!);
+  const names = (matches.length ? matches : things).map((thing) => `"${thing.name}"`).join(", ");
+  return matches.length
+    ? toolError("invalid", `"${ref}" matches more than one ${noun}: ${names}. Say which.`)
+    : toolError("not_found", `No ${noun} called "${ref}". There are: ${names || "none"}.`);
+}
