@@ -1,4 +1,5 @@
 import {
+  Bot,
   CalendarDays,
   CloudSun,
   Gauge,
@@ -23,6 +24,7 @@ export const APP_ICONS: Record<AppKey, LucideIcon> = {
   food: UtensilsCrossed,
   finance: PiggyBank,
   admin: Gauge,
+  agent: Bot,
 };
 
 /** Stroke width for every lucide icon in the shell. */
