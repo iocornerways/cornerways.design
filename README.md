@@ -43,7 +43,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `src/layout.tsx` | `<Workspace>` and `<Reading>` components |
 | `src/Header.tsx` | `<Header>`: breadcrumb app switcher, page-actions slot, account menu |
 | `src/controls.tsx` | `<Button>`, `<IconButton>`, `<Pill>`, `<Segmented>`, `<Toolbar>`, `<Footer>` |
-| `src/install/` | Install support: `install.js` + `install.css` (the "Install app" card, framework-free), `pwa.js` (Vite plugin emitting `/sw.js` and `/offline.html`), `sw-core.js` and `offline.html` (their templates) |
+| `src/install/` | Install support: `install.js` + `install.css` (the "Install app" card, framework-free), `pwa.js` (Vite plugin emitting `/sw.js`, with the offline page built in), `sw-core.js` and `offline.html` (its templates) |
 | `preview-site/` | Every component in both themes plus a 390px frame: `npm run preview` |
 
 ## Components
@@ -83,7 +83,7 @@ const { theme, setTheme } = useTheme();
 Every family site installs to a home screen or desktop. Two halves:
 
 ```ts
-// vite.config.ts: the service worker, offline page and standalone meta tags (client build only)
+// vite.config.ts: the service worker (offline page built in) and standalone meta tags (client build only)
 import { cornerwaysPwa } from "@cornerways/design/pwa";
 plugins: [react(), cloudflare(), cornerwaysPwa({ appName: meta.name })]
 
@@ -94,9 +94,9 @@ initInstallPrompt({ appName: "Todo" });
 ```
 
 - **The card.** Chromium (Android, desktop Chrome/Edge) shows an Install button that opens the browser's own prompt. iPhone and iPad show the Share → Add to Home Screen steps, or "Open in Safari" inside an in-app browser. Hidden when already installed, in an iframe, or on the kiosk (`?kiosk=1`, remembered for the tab). "Not now" holds for 30 days. Theme it with the `--cw-install-*` properties in `install.css`.
-- **The service worker.** Page loads go to the network, falling back to `/offline.html` only with no connection; sign-in redirects pass through. Hashed `/assets/*` are cached once seen; `/api/*` and other origins are never touched. Each build gets a new version and clears the old caches.
-- **Public paths.** Add `/sw.js` and `/offline.html` to the site's `PUBLIC_PATHS`, so the browser can fetch them signed out.
-- **The hub** has no bundler: its sync script copies `install.js` and renders `sw.js` and `offline.html` with the same functions.
+- **The service worker.** Page loads go to the network, falling back to a friendly offline page (inside `sw.js`, so there's nothing to fetch) only with no connection; sign-in redirects pass through. Hashed `/assets/*` are cached once seen; `/api/*` and other origins are never touched. Each build gets a new version and clears the old caches.
+- **Public paths.** Add `/sw.js` to the site's `PUBLIC_PATHS`, so the browser can fetch it signed out.
+- **The hub** has no bundler: its sync script copies `install.js` and renders `sw.js` with the same function.
 
 ## Consuming the TSX from an app
 

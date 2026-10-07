@@ -8,6 +8,6 @@ export type CornerwaysPwaOptions = {
 };
 
 export function cornerwaysPwa(options: CornerwaysPwaOptions): Plugin;
-export function renderServiceWorker(options: { version: string; importScripts?: string[] }): string;
+export function renderServiceWorker(options: { appName: string; version: string; importScripts?: string[] }): string;
 export function renderOfflinePage(options: { appName: string }): string;
 export function hashOf(...parts: string[]): string;

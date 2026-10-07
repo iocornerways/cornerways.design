@@ -1,18 +1,19 @@
 /**
  * Build-time half of the install support (Node only, never in a client
- * bundle): renders /sw.js and /offline.html from the templates beside this
- * file. Plain JS, not TS, because Node won't strip types under node_modules
- * and both a Vite config and the hub's sync script load it directly.
+ * bundle): renders /sw.js, with the offline page inside it, from the
+ * templates beside this file. Plain JS, not TS, because Node won't strip
+ * types under node_modules and both a Vite config and the hub's sync script
+ * load it directly.
  *
  *   import { cornerwaysPwa } from "@cornerways/design/pwa";
  *   plugins: [..., cornerwaysPwa({ appName: meta.name })]
  *
  * The plugin, in the client build only:
  *  - emits sw.js (versioned by a hash of the build's file names, so every
- *    deploy that changes anything replaces the old caches) and offline.html;
+ *    deploy that changes anything replaces the old caches);
  *  - adds the standalone meta tags and a service worker registration to
  *    index.html.
- * Both paths must be in the site's PUBLIC_PATHS so the browser can fetch them
+ * /sw.js must be in the site's PUBLIC_PATHS so the browser can fetch it
  * signed out. In `vite dev` nothing is registered, so dev never caches.
  */
 import { createHash } from "node:crypto";
@@ -21,17 +22,20 @@ import { readFileSync } from "node:fs";
 const SW_TEMPLATE = new URL("./sw-core.js", import.meta.url);
 const OFFLINE_TEMPLATE = new URL("./offline.html", import.meta.url);
 
-/** @param {{ version: string, importScripts?: string[] }} options */
-export function renderServiceWorker({ version, importScripts = [] }) {
+/** @param {{ appName: string, version: string, importScripts?: string[] }} options */
+export function renderServiceWorker({ appName, version, importScripts = [] }) {
+  // Function replacers: the page's HTML may contain "$", which a string
+  // replacement would read as a pattern.
   return readFileSync(SW_TEMPLATE, "utf8")
-    .replace("__CW_SW_VERSION__", version)
-    .replace("__CW_SW_IMPORTS__", JSON.stringify(importScripts));
+    .replace("__CW_SW_VERSION__", () => version)
+    .replace("__CW_SW_IMPORTS__", () => JSON.stringify(importScripts))
+    .replace("__CW_OFFLINE_HTML__", () => JSON.stringify(renderOfflinePage({ appName })));
 }
 
 /** @param {{ appName: string }} options */
 export function renderOfflinePage({ appName }) {
   const escaped = appName.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
-  return readFileSync(OFFLINE_TEMPLATE, "utf8").replaceAll("__CW_APP_NAME__", escaped);
+  return readFileSync(OFFLINE_TEMPLATE, "utf8").replaceAll("__CW_APP_NAME__", () => escaped);
 }
 
 export function hashOf(...parts) {
@@ -71,10 +75,8 @@ export function cornerwaysPwa({ appName, importScripts = [] }) {
       // The cloudflare plugin builds the Worker as its own environment; the
       // service worker belongs with the client assets only.
       if (this.environment && this.environment.name !== "client") return;
-      const offline = renderOfflinePage({ appName });
-      const version = hashOf(Object.keys(bundle).sort().join("\n"), offline, JSON.stringify(importScripts));
-      this.emitFile({ type: "asset", fileName: "offline.html", source: offline });
-      this.emitFile({ type: "asset", fileName: "sw.js", source: renderServiceWorker({ version, importScripts }) });
+      const version = hashOf(Object.keys(bundle).sort().join("\n"), appName, JSON.stringify(importScripts));
+      this.emitFile({ type: "asset", fileName: "sw.js", source: renderServiceWorker({ appName, version, importScripts }) });
     },
   };
 }

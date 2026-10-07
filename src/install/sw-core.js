@@ -1,20 +1,23 @@
 /* Cornerways service worker. Built into each site's /sw.js by the
-   cornerwaysPwa() Vite plugin (vite.js), or the hub's sync script, which
-   replace the two placeholders below.
+   cornerwaysPwa() Vite plugin (pwa.js), or the hub's sync script, which
+   fill in the __CW_*__ placeholders below.
 
    Deliberately small: every page is live and behind sign-in, so nothing
    personal is cached. Page loads always go to the network, falling back to
-   /offline.html only when there's no connection; sign-in redirects pass
-   straight through. Vite's hashed /assets/* never change, so they're served
-   from cache once seen. /api/* and other origins aren't touched. Each deploy
+   the offline page only when there's no connection; sign-in redirects pass
+   straight through. The offline page is built into this file, so there's
+   nothing to fetch for it (and no clean-URL redirect from /offline.html to
+   trip over); its icon is the one file precached. Vite's hashed /assets/*
+   never change, so they're served from cache once seen. /api/* and other origins aren't touched. Each deploy
    gets a new VERSION, and activating it deletes the old caches. */
 
 /* global self, caches, importScripts */
 
 const VERSION = "__CW_SW_VERSION__";
 const PRECACHE = `cw-precache-${VERSION}`;
+const OFFLINE_ICON = "/icon-192.png";
 const ASSETS = `cw-assets-${VERSION}`;
-const OFFLINE_URL = "/offline.html";
+const OFFLINE_HTML = __CW_OFFLINE_HTML__;
 
 importScripts(...__CW_SW_IMPORTS__);
 
@@ -22,7 +25,9 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(PRECACHE)
-      .then((cache) => cache.addAll([OFFLINE_URL, "/icon-192.png"]))
+      // The icon on the offline page; nothing else is worth keeping.
+      .then((cache) => cache.add(OFFLINE_ICON))
+      .catch(() => {})
       .then(() => self.skipWaiting()),
   );
 });
@@ -53,11 +58,15 @@ self.addEventListener("fetch", (event) => {
           const preloaded = await event.preloadResponse;
           return preloaded || (await fetch(request));
         } catch {
-          const offline = await caches.match(OFFLINE_URL);
-          return offline || Response.error();
+          return new Response(OFFLINE_HTML, { headers: { "Content-Type": "text/html; charset=utf-8" } });
         }
       })(),
     );
+    return;
+  }
+
+  if (url.pathname === OFFLINE_ICON) {
+    event.respondWith(fetch(request).catch(async () => (await caches.match(OFFLINE_ICON)) || Response.error()));
     return;
   }
 
