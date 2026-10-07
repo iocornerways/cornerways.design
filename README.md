@@ -43,6 +43,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `src/layout.tsx` | `<Workspace>` and `<Reading>` components |
 | `src/Header.tsx` | `<Header>`: breadcrumb app switcher, page-actions slot, account menu |
 | `src/controls.tsx` | `<Button>`, `<IconButton>`, `<Pill>`, `<Segmented>`, `<Toolbar>`, `<Footer>` |
+| `src/install/` | Install support: `install.js` + `install.css` (the "Install app" card, framework-free), `pwa.js` (Vite plugin emitting `/sw.js` and `/offline.html`), `sw-core.js` and `offline.html` (their templates) |
 | `preview-site/` | Every component in both themes plus a 390px frame: `npm run preview` |
 
 ## Components
@@ -76,6 +77,26 @@ const { theme, setTheme } = useTheme();
 - **SegmentedMulti.** The same track with any number of segments on at once, for filters (people, statuses); options take an optional colour `dot`.
 - **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default; hidden below 640px.
 - **Icons.** lucide-react at `ICON_STROKE` (1.7), 18px in controls. `APP_ICONS[key]` is the app's line icon.
+
+## Installing as an app
+
+Every family site installs to a home screen or desktop. Two halves:
+
+```ts
+// vite.config.ts: the service worker, offline page and standalone meta tags (client build only)
+import { cornerwaysPwa } from "@cornerways/design/pwa";
+plugins: [react(), cloudflare(), cornerwaysPwa({ appName: meta.name })]
+
+// src/client/main.tsx: the install card
+import { initInstallPrompt } from "@cornerways/design/install";
+import "@cornerways/design/install.css";
+initInstallPrompt({ appName: "Todo" });
+```
+
+- **The card.** Chromium (Android, desktop Chrome/Edge) shows an Install button that opens the browser's own prompt. iPhone and iPad show the Share → Add to Home Screen steps, or "Open in Safari" inside an in-app browser. Hidden when already installed, in an iframe, or on the kiosk (`?kiosk=1`, remembered for the tab). "Not now" holds for 30 days. Theme it with the `--cw-install-*` properties in `install.css`.
+- **The service worker.** Page loads go to the network, falling back to `/offline.html` only with no connection; sign-in redirects pass through. Hashed `/assets/*` are cached once seen; `/api/*` and other origins are never touched. Each build gets a new version and clears the old caches.
+- **Public paths.** Add `/sw.js` and `/offline.html` to the site's `PUBLIC_PATHS`, so the browser can fetch them signed out.
+- **The hub** has no bundler: its sync script copies `install.js` and renders `sw.js` and `offline.html` with the same functions.
 
 ## Consuming the TSX from an app
 

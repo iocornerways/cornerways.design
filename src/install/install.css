@@ -1,0 +1,208 @@
+/* The "install this app" card from install.js.
+   Theme per site by overriding the --cw-install-* properties; they default to
+   the shell tokens, so light/dark follow <html data-theme> with no extra work
+   (with plain light-mode fallbacks for a page without tokens.css). */
+
+.cw-install {
+  --cw-install-surface: var(--cw-surface-raised, #ffffff);
+  --cw-install-ink: var(--cw-ink, #1f1d1a);
+  --cw-install-muted: var(--cw-muted, #5a5651);
+  --cw-install-border: var(--cw-border, #ddd9d2);
+  --cw-install-accent: var(--cw-brand, #b4401e);
+  --cw-install-accent-ink: var(--cw-brand-ink, #ffffff);
+  --cw-install-radius: var(--cw-radius-card-lg, 16px);
+  --cw-install-shadow: var(--cw-shadow-3, 0 16px 40px rgb(31 29 26 / 0.16));
+  --cw-install-focus: var(--cw-focus-ring, 0 0 0 3px color-mix(in srgb, #b4401e 28%, transparent));
+
+  position: fixed;
+  z-index: 60;
+  inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 16px;
+  background: var(--cw-install-surface);
+  color: var(--cw-install-ink);
+  border: 1px solid var(--cw-install-border);
+  border-radius: var(--cw-install-radius);
+  box-shadow: var(--cw-install-shadow);
+  font-family: var(--cw-font-ui, system-ui, sans-serif);
+  font-size: 16px;
+  line-height: 1.45;
+  animation: cw-install-in 220ms ease-out;
+}
+
+/* Desktop: tuck it into the bottom-right corner rather than centre it. */
+@media (min-width: 720px) {
+  .cw-install {
+    inset-inline: auto max(24px, env(safe-area-inset-right));
+    bottom: 24px;
+    width: 400px;
+  }
+}
+
+.cw-install * {
+  box-sizing: border-box;
+}
+
+.cw-install-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cw-install-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.cw-install-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.cw-install-title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.cw-install-body {
+  margin: 0;
+  color: var(--cw-install-muted);
+}
+
+.cw-install-steps {
+  margin: 6px 0 0;
+  padding-left: 22px;
+}
+
+.cw-install-steps li + li {
+  margin-top: 8px;
+}
+
+.cw-install-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cw-install-hint {
+  display: block;
+  color: var(--cw-install-muted);
+  font-size: 14px;
+}
+
+.cw-install-glyph {
+  width: 22px;
+  height: 22px;
+  vertical-align: -5px;
+  fill: none;
+  stroke: var(--cw-install-accent);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cw-install-glyph circle {
+  fill: var(--cw-install-accent);
+  stroke: none;
+}
+
+.cw-install-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px 0 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  color: var(--cw-install-muted);
+  cursor: pointer;
+}
+
+.cw-install-close svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cw-install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cw-install-primary,
+.cw-install-secondary {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: var(--cw-radius-control, 10px);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cw-install-primary {
+  background: var(--cw-install-accent);
+  color: var(--cw-install-accent-ink);
+  border: 1px solid var(--cw-install-accent);
+}
+
+.cw-install-secondary {
+  flex-grow: 0;
+  background: transparent;
+  color: var(--cw-install-ink);
+  border: 1px solid var(--cw-install-border);
+}
+
+.cw-install-primary:focus-visible,
+.cw-install-secondary:focus-visible,
+.cw-install-close:focus-visible {
+  outline: none;
+  box-shadow: var(--cw-install-focus);
+}
+
+.cw-install-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes cw-install-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-install {
+    animation: none;
+  }
+}
+
+@media print {
+  .cw-install {
+    display: none;
+  }
+}

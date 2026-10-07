@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>__CW_APP_NAME__ · Offline</title>
+    <script>
+      // Same theme rule as every page: the domain-wide cw_theme cookie, else the system.
+      (function () {
+        try {
+          var match = document.cookie.match(/(?:^|; )cw_theme=([^;]*)/);
+          var theme = match ? decodeURIComponent(match[1]) : "auto";
+          if (theme !== "light" && theme !== "dark") {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          }
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      :root {
+        --bg: #f6f4f0;
+        --surface: #ffffff;
+        --ink: #1f1d1a;
+        --muted: #5a5651;
+        --border: #ddd9d2;
+        --brand: #b4401e;
+        color-scheme: light;
+      }
+      :root[data-theme="dark"] {
+        --bg: #1a1816;
+        --surface: #262320;
+        --ink: #f1ede7;
+        --muted: #a69f96;
+        --border: #3b3630;
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+        background: var(--bg);
+        color: var(--ink);
+        font: 18px/1.5 Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+        text-align: center;
+      }
+      main {
+        width: 100%;
+        max-width: 420px;
+        padding: 32px 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+      }
+      img { width: 72px; height: 72px; border-radius: 16px; }
+      h1 { margin: 16px 0 8px; font-size: 26px; line-height: 1.2; }
+      p { margin: 0 0 24px; color: var(--muted); }
+      button {
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icon-192.png" alt="" />
+      <h1>You're offline</h1>
+      <p>__CW_APP_NAME__ needs an internet connection. Check your Wi-Fi or mobile data — we'll reconnect as soon as it's back.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+    <script>
+      window.addEventListener("online", function () { location.reload(); });
+    </script>
+  </body>
+</html>
