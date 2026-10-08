@@ -633,3 +633,85 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* ---------- Return bar (returnBar.ts) ---------- */
+
+/* Along the bottom, clear of every app's sticky header: the way back to
+   the family page that sent someone here (the hub's /welcome, say). */
+.cw-return-bar {
+  position: fixed;
+  z-index: 61;
+  inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 520px;
+  margin-inline: auto;
+  padding: 6px 6px 6px 8px;
+  background: var(--cw-ink);
+  color: var(--cw-surface);
+  border-radius: var(--cw-radius-pill);
+  box-shadow: var(--cw-shadow-3);
+  font-family: var(--cw-font-ui);
+}
+
+.cw-return-bar-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--cw-radius-pill);
+  color: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cw-return-bar-link:hover {
+  background: color-mix(in srgb, var(--cw-surface) 12%, transparent);
+  color: inherit;
+}
+
+.cw-return-bar-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.cw-return-bar-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cw-return-bar :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cw-surface) 55%, transparent);
+}
+
+/* One thing at the bottom at a time: the install card waits. */
+[data-cw-returning] .cw-install {
+  display: none;
+}
+
+@media print {
+  .cw-return-bar {
+    display: none;
+  }
+}

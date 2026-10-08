@@ -44,6 +44,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `src/Header.tsx` | `<Header>`: breadcrumb app switcher, page-actions slot, account menu |
 | `src/controls.tsx` | `<Button>`, `<IconButton>`, `<Pill>`, `<Segmented>`, `<Toolbar>`, `<Footer>` |
 | `src/install/` | Install support: `install.js` + `install.css` (the "Install app" card, framework-free), `pwa.js` (Vite plugin emitting `/sw.js`, with the offline page built in), `sw-core.js` and `offline.html` (its templates) |
+| `src/returnBar.ts` | `initReturnBar()`: a "← Back to …" bar when another family page opened this app with `?return_to=` (the hub's /welcome does), checked against the family's hosts |
 | `preview-site/` | Every component in both themes plus a 390px frame: `npm run preview` |
 
 ## Components
