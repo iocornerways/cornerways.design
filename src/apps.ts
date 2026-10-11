@@ -42,7 +42,7 @@ export const APPS: readonly AppDefinition[] = [
   { key: "agent", name: "Agents", description: "Connects Claude and other agents to the household's apps, as the person who signed in.", host: "mcp.cornerways.io", devPort: 5182, accent: "#4a5560", mode: "reading", hidden: true },
   // Moving onto the family from countingthepennies.com (2026-10): finance.cornerways.io
   // redirects there until the cutover, test.finance.cornerways.io is already the real app.
-  { key: "finance", name: "Finance", description: "Household finances and budgets to help us manage the pennies.", host: "finance.cornerways.io", devPort: 5184, accent: "#2f6b3a", mode: "reading" },
+  { key: "finance", name: "Finance", description: "Household finances and budgets to help us manage the pennies.", host: "finance.cornerways.io", devPort: 5184, accent: "#2f6b3a", mode: "workspace" },
 ];
 
 export const HUB_HOST = "cornerways.io";
