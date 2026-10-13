@@ -19,68 +19,90 @@
       })();
     </script>
     <style>
+      /* The hub's sign-in card, with its tokens inlined: this page is served
+         from the service worker with no connection, so it can't load the
+         design stylesheet or the webfonts. */
       :root {
-        --bg: #f6f4f0;
+        --canvas: #f6f4f0;
         --surface: #ffffff;
+        --border-soft: #e4e0d9;
         --ink: #1f1d1a;
         --muted: #5a5651;
-        --border: #ddd9d2;
         --brand: #b4401e;
+        --brand-ink: #ffffff;
+        --brand-hover: #a0381a;
+        --shadow-1: 0 1px 2px rgb(31 29 26 / 0.06);
         color-scheme: light;
       }
       :root[data-theme="dark"] {
-        --bg: #1a1816;
+        --canvas: #1a1816;
         --surface: #262320;
+        --border-soft: #34302b;
         --ink: #f1ede7;
         --muted: #a69f96;
-        --border: #3b3630;
+        --brand-hover: #c44a25;
+        --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
         color-scheme: dark;
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
         min-height: 100vh;
         min-height: 100dvh;
-        display: grid;
-        place-items: center;
-        padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
-        background: var(--bg);
-        color: var(--ink);
-        font: 18px/1.5 Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
       }
-      main {
+      .card {
         width: 100%;
-        max-width: 420px;
-        padding: 32px 24px;
+        max-width: 400px;
+        padding: 36px 32px;
         background: var(--surface);
-        border: 1px solid var(--border);
+        border: 1px solid var(--border-soft);
         border-radius: 16px;
+        box-shadow: var(--shadow-1);
       }
-      img { width: 72px; height: 72px; border-radius: 16px; }
-      h1 { margin: 16px 0 8px; font-size: 26px; line-height: 1.2; }
-      p { margin: 0 0 24px; color: var(--muted); }
+      .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+      .brand svg { display: block; }
+      .brand span { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 600; }
+      h1 { margin: 0 0 8px; font-family: "Source Serif 4", Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 600; line-height: 1.2; }
+      .lede { margin: 0 0 24px; font-size: 14px; line-height: 1.6; color: var(--muted); }
       button {
         width: 100%;
-        min-height: 52px;
+        padding: 11px;
+        margin-top: 6px;
         border: 0;
-        border-radius: 12px;
+        border-radius: 10px;
         background: var(--brand);
-        color: #fff;
+        color: var(--brand-ink);
         font: inherit;
+        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
       }
-      button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 3px; }
+      button:hover { background: var(--brand-hover); }
+      button:focus-visible { outline: 2px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 1px; }
     </style>
   </head>
   <body>
-    <main>
-      <img src="/icon-192.png" alt="" />
-      <h1>You're offline</h1>
-      <p>__CW_APP_NAME__ needs an internet connection. Check your Wi-Fi or mobile data — we'll reconnect as soon as it's back.</p>
-      <button type="button" onclick="location.reload()">Try again</button>
-    </main>
+    <div class="wrap">
+      <main class="card">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 15V11C9.5 9.6193 10.6193 8.5 12 8.5H15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span>__CW_APP_NAME__</span>
+        </div>
+        <h1>You're offline</h1>
+        <p class="lede">__CW_APP_NAME__ needs an internet connection. Check your Wi-Fi or mobile data — it reconnects as soon as you're back.</p>
+        <button type="button" onclick="location.reload()">Try again</button>
+      </main>
+    </div>
     <script>
       window.addEventListener("online", function () { location.reload(); });
     </script>
