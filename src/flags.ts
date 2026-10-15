@@ -58,6 +58,15 @@ export type Flags = {
   get<T extends string | number | boolean>(path: string, fallback: T): T;
   /** "resolver" when Confidence answered, "defaults" when it couldn't be asked. */
   source: "resolver" | "defaults";
+  /**
+   * Why a flag gave what it gave, for debugging: Confidence's reason
+   * ("RESOLVE_REASON_MATCH", "RESOLVE_REASON_NO_SEGMENT_MATCH", …),
+   * "NOT_RETURNED" when Confidence left it out (not enabled for this
+   * client?), or "DEFAULTS" when Confidence couldn't be asked.
+   */
+  reason(flag: string): string;
+  /** The top-level field names a matched flag's value has, to spot a misspelt property. */
+  fields(flag: string): string[];
 };
 
 const DEFAULT_TIMEOUT_MS = 1000;
@@ -110,14 +119,16 @@ export async function resolveFlags(
     }
     const body = (await response.json()) as { resolvedFlags?: { flag?: string; reason?: string | number; value?: unknown }[] };
     const values = new Map<string, unknown>();
+    const reasons = new Map<string, string>();
     for (const resolved of body.resolvedFlags ?? []) {
+      if (resolved.flag) reasons.set(resolved.flag.replace(/^flags\//, ""), String(resolved.reason ?? "UNKNOWN"));
       // Only a matched rule carries a value worth using; anything else (no
       // segment matched, archived, targeting key error) means "use the default".
       // (Protobuf JSON names the enum; 1 is the same value sent as a number.)
       if (!resolved.flag || (resolved.reason !== "RESOLVE_REASON_MATCH" && resolved.reason !== 1)) continue;
       values.set(resolved.flag.replace(/^flags\//, ""), resolved.value);
     }
-    return flagsFrom(values, overrides, "resolver");
+    return flagsFrom(values, overrides, "resolver", reasons);
   } catch (err) {
     console.warn("flags: resolver unavailable", err instanceof Error ? err.message : err);
     return flagsFrom(new Map(), overrides, "defaults");
@@ -129,9 +140,19 @@ export function defaultFlags(env: Pick<FlagEnv, "FLAG_OVERRIDES"> = {}): Flags {
   return flagsFrom(new Map(), parseOverrides(env.FLAG_OVERRIDES), "defaults");
 }
 
-function flagsFrom(values: Map<string, unknown>, overrides: Map<string, unknown>, source: Flags["source"]): Flags {
+function flagsFrom(
+  values: Map<string, unknown>,
+  overrides: Map<string, unknown>,
+  source: Flags["source"],
+  reasons: Map<string, string> = new Map(),
+): Flags {
   return {
     source,
+    reason: (flag) => (source === "defaults" ? "DEFAULTS" : (reasons.get(flag) ?? "NOT_RETURNED")),
+    fields: (flag) => {
+      const value = values.get(flag);
+      return value && typeof value === "object" ? Object.keys(value) : [];
+    },
     get<T extends string | number | boolean>(path: string, fallback: T): T {
       const overridden = overrides.get(path);
       if (overridden !== undefined && typeof overridden === typeof fallback) return overridden as T;
