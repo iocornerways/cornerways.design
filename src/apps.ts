@@ -37,7 +37,7 @@ export const APPS: readonly AppDefinition[] = [
   { key: "trips", name: "Trips", description: "Trip memories, and planning the next one together.", host: "travel.cornerways.io", devPort: 5176, accent: "#b4401e", mode: "workspace" },
   { key: "trains", name: "Trains", description: "Live train times and the daily commute, sorted.", host: "trains.cornerways.io", devPort: 5175, accent: "#2f5fc4", mode: "reading" },
   { key: "food", name: "Food", description: "Weekly meal planning, recipes, and what's in the fridge, freezer and cupboard.", host: "food.cornerways.io", devPort: 5180, accent: "#a33a2a", mode: "workspace" },
-  { key: "notes", name: "Notes", description: "Shared notes: the Wi-Fi password, gift ideas, checklists and how-tos.", host: "notes.cornerways.io", devPort: 5183, accent: "#8c3f68", mode: "workspace" },
+  { key: "notes", name: "Notebook", description: "Notes and boards: the Wi-Fi password, gift ideas, how-tos and project mood boards.", host: "notes.cornerways.io", devPort: 5183, accent: "#8c3f68", mode: "workspace" },
   { key: "admin", name: "Mission Control", description: "Platform usage, households and health, for platform admins.", host: "admin.cornerways.io", devPort: 5181, accent: "#4a5560", mode: "workspace", hidden: true },
   { key: "agent", name: "Agents", description: "Connects Claude and other agents to the household's apps, as the person who signed in.", host: "mcp.cornerways.io", devPort: 5182, accent: "#4a5560", mode: "reading", hidden: true },
   // Moving onto the family from countingthepennies.com (2026-10): finance.cornerways.io
