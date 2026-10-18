@@ -28,6 +28,13 @@ export type AuthEnv = {
   /** Hub only: the Ed25519 private key (JWK) that signs sessions. */
   SESSION_SIGNING_KEY?: string;
   /**
+   * Local development and tests only: the public half (base64url "x") of a
+   * signing key to verify sessions with, in place of the built-in
+   * development key, so a test run can sign with a throwaway keypair.
+   * Ignored on test and production, which always use their built-in keys.
+   */
+  SESSION_VERIFY_KEY?: string;
+  /**
    * Hub only, during the changeover from shared-secret cookies: verifies an
    * old cookie once so it can be swapped for a signed one. No app needs it.
    */
@@ -143,13 +150,15 @@ function parsePayload(json: string): SessionPayload | null {
   }
 }
 
-const publicKeys = new Map<Environment, Promise<CryptoKey>>();
+const publicKeys = new Map<string, Promise<CryptoKey>>();
 function publicKey(env: AuthEnv): Promise<CryptoKey> {
   const environment = environmentOf(env);
-  let key = publicKeys.get(environment);
+  // Only development may swap in its own key (see SESSION_VERIFY_KEY); test and production never can.
+  const x = environment === "development" && env.SESSION_VERIFY_KEY ? env.SESSION_VERIFY_KEY : SESSION_PUBLIC_KEYS[environment];
+  let key = publicKeys.get(x);
   if (!key) {
-    key = crypto.subtle.importKey("jwk", { kty: "OKP", crv: "Ed25519", x: SESSION_PUBLIC_KEYS[environment] }, { name: "Ed25519" }, false, ["verify"]);
-    publicKeys.set(environment, key);
+    key = crypto.subtle.importKey("jwk", { kty: "OKP", crv: "Ed25519", x }, { name: "Ed25519" }, false, ["verify"]);
+    publicKeys.set(x, key);
   }
   return key;
 }
