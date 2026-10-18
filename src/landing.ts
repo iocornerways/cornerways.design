@@ -134,6 +134,22 @@ const PAGE_CSS = `
   }
 `;
 
+/** The shared cw_theme cookie, for `theme`: dark only when it says so (Auto and unset get light). */
+export function themeFromCookie(cookieHeader: string | null | undefined): "light" | "dark" {
+  return /(?:^|;\s*)cw_theme=dark(?:;|$)/.test(cookieHeader ?? "") ? "dark" : "light";
+}
+
+/**
+ * True for a browser loading a page, not a script, image or fetch: only
+ * those should get the landing page. Browsers say so in Sec-Fetch-Dest;
+ * without it, an Accept of text/html will do.
+ */
+export function isPageLoad(headers: { get(name: string): string | null }): boolean {
+  const dest = headers.get("sec-fetch-dest");
+  if (dest) return dest === "document";
+  return (headers.get("accept") ?? "").includes("text/html");
+}
+
 /** The whole page, as an HTML string, ready for `c.html(...)`. */
 export function renderLandingPage(options: LandingPageOptions): string {
   const app = APPS.find((entry) => entry.key === options.app);

@@ -136,7 +136,7 @@ return c.html(renderLandingPage({
 }));
 ```
 
-The page is `noindex`; app sites aren't meant to be found by search engines. It inlines the shell's CSS through Vite's `?raw`, so the app's Worker must build with Vite (`@cloudflare/vite-plugin`), as every app's does.
+Two helpers go with it: `isPageLoad(c.req.raw.headers)` (only a browser loading a page should get it) and `themeFromCookie(c.req.header("cookie"))` (the visitor's Light or Dark). The page is `noindex`; app sites aren't meant to be found by search engines. It inlines the shell's CSS through Vite's `?raw`, so the app's Worker must build with Vite (`@cloudflare/vite-plugin`), as every app's does.
 
 ## Installing as an app
 
