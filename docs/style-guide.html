@@ -1,0 +1,303 @@
+<title>Cornerways Style Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: the shell itself. A full-bleed 56px header, then an 880px reading column, as the hub and Weather use.
+   Tokens are the real @cornerways/design values (tokens.css, v0.17.0). */
+:root {
+  --canvas: #f6f4f0;
+  --header: #fbfaf8;
+  --surface: #ffffff;
+  --border: #ddd9d2;
+  --border-soft: #ece9e3;
+  --ink: #1f1d1a;
+  --muted: #5a5651;
+  --brand: #b4401e;
+  --brand-ink: #ffffff;
+  --brand-text: #b4401e;
+  --brand-soft: color-mix(in srgb, #b4401e 10%, transparent);
+  --track: #ece9e3;
+  --shadow-1: 0 1px 2px rgb(31 29 26 / 0.06);
+  --focus: 0 0 0 3px color-mix(in srgb, #b4401e 28%, transparent);
+  --font-ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --gutter: 16px;
+}
+@media (min-width: 640px) { :root { --gutter: 24px; } }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #1a1816; --header: #201d1a; --surface: #262320; --border: #3b3630; --border-soft: #2d2a26;
+    --ink: #f1ede7; --muted: #a69f96; --brand-text: #e58a66; --track: #2d2a26;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --canvas: #1a1816; --header: #201d1a; --surface: #262320; --border: #3b3630; --border-soft: #2d2a26;
+  --ink: #f1ede7; --muted: #a69f96; --brand-text: #e58a66; --track: #2d2a26;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font: 400 15px/1.6 var(--font-ui); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--header); }
+a { color: var(--brand-text); }
+code { font: 0.86em var(--font-mono); background: var(--track); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+:focus-visible { outline: none; box-shadow: var(--focus); }
+
+.gut { padding-left: max(var(--gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
+
+/* Header, as the shell draws it */
+.hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--header); border-bottom: 1px solid var(--border); }
+.hdr-in { height: 56px; display: flex; align-items: center; gap: 10px; }
+.hdr .mark { color: var(--ink); flex: none; }
+.hdr .word { font: 600 1.05rem var(--font-display); }
+.hdr .slash { color: var(--muted); }
+.hdr .app { font-weight: 600; font-size: 0.95rem; }
+.hdr .sp { flex: 1; }
+.hdr .rev { font-size: 0.8rem; color: var(--muted); }
+@media (max-width: 639px) { .hdr .word, .hdr .slash { display: none; } }
+
+.reading { max-width: 880px; margin: 0 auto; padding-block: 40px 56px; display: grid; gap: 48px; }
+.intro h1 { font: 600 clamp(2rem, 5vw, 2.6rem)/1.15 var(--font-display); margin-bottom: 12px; }
+.intro p { margin: 0 0 10px; max-width: 64ch; color: var(--muted); font-size: 1.02rem; }
+.intro p strong { color: var(--ink); }
+
+section { display: grid; gap: 16px; min-width: 0; }
+section > h2 { font: 600 1.45rem/1.25 var(--font-display); }
+.eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+section > p, section > ul { margin: 0; max-width: 66ch; }
+section > ul { padding-left: 20px; display: grid; gap: 6px; }
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+/* Layout mode diagrams */
+.mode h3 { font-size: 0.95rem; margin-bottom: 4px; }
+.mode p { margin: 0 0 12px; font-size: 0.85rem; color: var(--muted); }
+.frame { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--canvas); aspect-ratio: 16 / 10; max-width: 100%; display: grid; grid-template-rows: 14% 15% 1fr; }
+.frame .f-h { background: var(--header); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 6%; gap: 4%; }
+.frame .f-h i { display: block; height: 32%; border-radius: 3px; background: var(--border); }
+.frame .f-t { border-bottom: 1px solid var(--border-soft); margin: 0 6%; display: flex; align-items: center; gap: 3%; }
+.frame .f-t i { display: block; height: 42%; width: 14%; border-radius: 99px; background: var(--track); }
+.frame .f-t i.on { background: var(--brand); width: 12%; margin-left: auto; border-radius: 4px; }
+.frame .f-b { padding: 4% 6%; display: grid; gap: 4%; }
+.frame .f-b.read { padding-inline: 22%; }
+.frame .f-b i { display: block; border-radius: 4px; background: var(--surface); border: 1px solid var(--border-soft); }
+
+/* Tables */
+.tw { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+th { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Colour */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.sw { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.sw .chip { width: 34px; height: 34px; border-radius: 8px; flex: none; display: grid; place-items: center; color: #fff; }
+.sw b { display: block; font-size: 0.85rem; font-weight: 600; }
+.sw span { font: 0.75rem var(--font-mono); color: var(--muted); }
+.rule { border-left: 3px solid var(--brand); padding: 2px 0 2px 14px; max-width: 66ch; }
+
+/* Type */
+.type-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--border-soft); }
+.type-row:last-child { border-bottom: 0; }
+.type-row .spec { font-size: 0.78rem; color: var(--muted); }
+.type-row .spec b { display: block; color: var(--ink); font-weight: 600; }
+@media (max-width: 560px) { .type-row { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* Specimens, built to the shell's sizes */
+.spec-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { appearance: none; font: 600 0.9rem var(--font-ui); height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.ibtn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.ibtn[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); color: var(--brand-text); }
+.pill { height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); font: 500 0.88rem var(--font-ui); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.pill[aria-pressed="true"] { border-color: var(--ink); }
+.pill .dot { width: 9px; height: 9px; border-radius: 50%; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--track); }
+.seg button { appearance: none; border: 0; background: none; font: 500 0.88rem var(--font-ui); color: var(--muted); height: 34px; padding: 0 14px; border-radius: 8px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
+.cap { font-size: 0.8rem; color: var(--muted); margin: 10px 0 0; }
+
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; max-width: 66ch; }
+
+footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+@media (prefers-reduced-motion: no-preference) { .btn, .pill, .seg button, .ibtn { transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease; } }
+</style>
+
+<header class="hdr">
+  <div class="hdr-in gut">
+    <svg class="mark" viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 15V11C9.5 9.6193 10.6193 8.5 12 8.5H15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="word">Cornerways</span><span class="slash">/</span><span class="app">Style guide</span>
+    <span class="sp"></span><span class="rev">Rev B · 17 Oct 2026</span>
+  </div>
+</header>
+
+<main class="reading gut">
+  <div class="intro">
+    <h1>How every Cornerways site looks and behaves</h1>
+    <p>The rules are short because the shell is built once, in <strong><code>@cornerways/design</code></strong> (v0.17.0), and imported by every app. This page is drawn with the package's own tokens and sizes.</p>
+    <p>The package README has the component API, and <code>npm run preview</code> shows every component in both themes. Source: <code>cornerways.design/docs/style-guide.md</code>.</p>
+  </div>
+
+  <section id="principles">
+    <div class="eyebrow">Principles</div>
+    <h2>One product, neutral first, big on phones</h2>
+    <ul>
+      <li><strong>One product.</strong> Every app wears the same header, controls and footer from the shared shell. Don't copy shell code into an app; bump the package tag instead.</li>
+      <li><strong>Neutral first.</strong> Canvas and surfaces are warm neutrals. Colour is kept for meaning: one brand colour for actions, and each app's accent for its icon and data.</li>
+      <li><strong>Big and simple on phones.</strong> Controls are 40px tall with room between them. When a layout doesn't shrink well, build a separate phone layout (Calendar's month view) rather than squeeze the desktop one. Split long pages rather than densify them.</li>
+      <li><strong>Change the look, not the behaviour.</strong> Style work doesn't change what a page does. Note bugs you find; fix them separately.</li>
+    </ul>
+  </section>
+
+  <section id="layout">
+    <div class="eyebrow">Layout</div>
+    <h2>A full-bleed header and two layout modes</h2>
+    <p>The header is always full width: mark and wordmark on the left (linking to the hub), then <code>/</code> and the app name, which opens the app switcher. Page actions and the account menu are on the right. Pages line up with the header's gutter: <strong>24px, or 16px below 640px</strong>.</p>
+    <div class="grid2">
+      <div class="panel mode">
+        <h3>Workspace <code>.cw-workspace</code></h3>
+        <p>Full width, padded by the gutter. Calendar, Todo, Trips, Food, Notebook, Finance, Mission Control.</p>
+        <div class="frame" aria-hidden="true"><div class="f-h"><i style="width:18%"></i><i style="width:10%;margin-left:auto"></i></div><div class="f-t"><i></i><i></i><i class="on"></i></div><div class="f-b" style="grid-template-columns:repeat(4,1fr)"><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="panel mode">
+        <h3>Reading <code>.cw-reading</code></h3>
+        <p>A centred 880px column. Hub, Home, Weather, Trains.</p>
+        <div class="frame" aria-hidden="true"><div class="f-h"><i style="width:18%"></i><i style="width:10%;margin-left:auto"></i></div><div class="f-t" style="margin-inline:22%"><i></i><i></i></div><div class="f-b read" style="grid-template-rows:1fr 1fr"><i></i><i></i></div></div>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Element</th><th>Size</th></tr></thead>
+        <tbody>
+          <tr><td>Header</td><td class="num">56px</td></tr>
+          <tr><td>Toolbar, the row under the header</td><td class="num">60px</td></tr>
+          <tr><td>Controls and icon buttons</td><td class="num">40px · icon buttons 40×40</td></tr>
+          <tr><td>Radius</td><td class="num">10 controls · 12–16 cards · pills fully round</td></tr>
+          <tr><td>Breakpoint</td><td class="num">640px · below it the wordmark, account name and footer hide</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Each app's mode is in the <code>APPS</code> registry (<code>src/apps.ts</code>).</p>
+  </section>
+
+  <section id="colour">
+    <div class="eyebrow">Colour</div>
+    <h2>Warm neutrals, one brand colour, an accent per app</h2>
+    <div class="rule"><strong>Terracotta <code>#B4401E</code></strong> is only for primary actions, "today" and the active tab, with one primary button per page. Each app's accent is only for that app's icon and its data (chart lines, categories), never for chrome. Member colours come from the hub and are the same in every app.</div>
+    <div class="swatches" id="accents">
+      <div class="sw"><span class="chip" style="background:#b4401e"></span><div><b>Brand</b><span>#b4401e</span></div></div>
+      <div class="sw"><span class="chip" style="background:#3f6b4f"></span><div><b>Home</b><span>#3f6b4f</span></div></div>
+      <div class="sw"><span class="chip" style="background:#7a4e9e"></span><div><b>Calendar</b><span>#7a4e9e</span></div></div>
+      <div class="sw"><span class="chip" style="background:#8a6a12"></span><div><b>Todo</b><span>#8a6a12</span></div></div>
+      <div class="sw"><span class="chip" style="background:#1f6f8b"></span><div><b>Weather</b><span>#1f6f8b</span></div></div>
+      <div class="sw"><span class="chip" style="background:#b4401e"></span><div><b>Trips</b><span>#b4401e</span></div></div>
+      <div class="sw"><span class="chip" style="background:#2f5fc4"></span><div><b>Trains</b><span>#2f5fc4</span></div></div>
+      <div class="sw"><span class="chip" style="background:#a33a2a"></span><div><b>Food</b><span>#a33a2a</span></div></div>
+      <div class="sw"><span class="chip" style="background:#8c3f68"></span><div><b>Notebook</b><span>#8c3f68</span></div></div>
+      <div class="sw"><span class="chip" style="background:#2f6b3a"></span><div><b>Finance</b><span>#2f6b3a</span></div></div>
+      <div class="sw"><span class="chip" style="background:#4a5560"></span><div><b>Mission Control</b><span>#4a5560</span></div></div>
+    </div>
+    <p class="cap">Tokens: <code>--cw-canvas</code>, <code>--cw-surface</code>, <code>--cw-border</code>, <code>--cw-ink</code>, <code>--cw-muted</code>, <code>--cw-brand</code>, <code>--cw-accent-&lt;app&gt;</code>. Every colour has a light and a dark value.</p>
+  </section>
+
+  <section id="type">
+    <div class="eyebrow">Type and icons</div>
+    <h2>Figtree for the interface, Source Serif 4 for display</h2>
+    <div class="panel">
+      <div class="type-row"><div class="spec"><b>Display</b>Source Serif 4 · 600</div><div style="font:600 1.9rem/1.2 var(--font-display)">Meals this week</div></div>
+      <div class="type-row"><div class="spec"><b>Wordmark</b>Source Serif 4 · 600</div><div style="font:600 1.05rem var(--font-display)">Cornerways</div></div>
+      <div class="type-row"><div class="spec"><b>Interface</b>Figtree · 400 / 500 / 600</div><div>Bins out on Tuesday, recycling this week.</div></div>
+      <div class="type-row"><div class="spec"><b>Label</b>Figtree · 600 caps</div><div class="eyebrow" style="margin:0">Coming up</div></div>
+    </div>
+    <ul>
+      <li>Loaded from Google Fonts by a <code>&lt;link&gt;</code> in each page's <code>&lt;head&gt;</code> (the href is exported as <code>GOOGLE_FONTS_HREF</code>). Never use a CSS <code>@import url()</code>: Tailwind drops it.</li>
+      <li>Icons are lucide at stroke 1.7 (<code>ICON_STROKE</code>), 18px in controls and 16–20px elsewhere. <code>APP_ICONS[key]</code> is each app's line icon.</li>
+    </ul>
+  </section>
+
+  <section id="components">
+    <div class="eyebrow">Components</div>
+    <h2>Use the shell's controls before writing your own</h2>
+    <div class="panel">
+      <div class="spec-row">
+        <button class="btn primary" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add entry</button>
+        <button class="btn" type="button">Cancel</button>
+        <button class="btn ghost" type="button">Skip</button>
+        <button class="ibtn" type="button" aria-label="Meetups" aria-pressed="false" id="ib1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+      </div>
+      <p class="cap"><code>&lt;Button&gt;</code> primary, secondary (the default) and ghost; <code>&lt;IconButton&gt;</code> 40×40 with <code>active</code> for a toggle that is on. Tap the icon button.</p>
+      <div class="spec-row" style="margin-top:16px">
+        <div class="seg" role="group" aria-label="View" id="seg1"><button type="button" aria-pressed="true">Month</button><button type="button" aria-pressed="false">4 months</button><button type="button" aria-pressed="false">Year</button></div>
+        <button class="pill" type="button" aria-pressed="true" id="p1"><span class="dot" style="background:#4c8bf5"></span>Dave</button>
+        <button class="pill" type="button" aria-pressed="false" id="p2"><span class="dot" style="background:#2fae66"></span>Sam</button>
+      </div>
+      <p class="cap"><code>&lt;Segmented&gt;</code> picks one view (<code>&lt;SegmentedMulti&gt;</code> switches several filters on); <code>&lt;Pill&gt;</code> is a round filter toggle with an optional colour dot. Example names.</p>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Component</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;Header&gt;</code></td><td>Every page: app switcher, page-actions slot, account menu</td></tr>
+          <tr><td><code>&lt;Toolbar&gt;</code></td><td>The 60px row under the header: children on the left, <code>end</code> on the right</td></tr>
+          <tr><td><code>&lt;Footer&gt;</code></td><td>"Cornerways — built for family and friends." Hidden below 640px</td></tr>
+          <tr><td>Install card and service worker</td><td><code>@cornerways/design/install</code> and <code>/pwa</code>: every site installs as an app</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="theme">
+    <div class="eyebrow">Theme</div>
+    <h2>Chosen once, in the account menu</h2>
+    <ul>
+      <li><strong>Light, Dark or Auto</strong>, chosen only in the account menu and stored in the shared <code>cw_theme</code> cookie. No app has its own theme toggle or a stray Log out link.</li>
+      <li>Dark applies under <code>html[data-theme="dark"]</code>, set before first paint.</li>
+      <li><strong>Auto</strong> follows the system on most apps. Weather, Trains and Home follow the time of day in London instead, since they are what the kitchen tablet shows.</li>
+      <li><strong>The hub is light-only.</strong></li>
+    </ul>
+  </section>
+
+  <section id="kiosk">
+    <div class="eyebrow">Kiosk tablet</div>
+    <h2>A mode, not a breakpoint</h2>
+    <p><code>?kiosk=1</code> turns on kiosk mode. The shared header and footer are hidden, and boards use large type, no hover and no scrolling. Installed home-screen apps keep the header. What each tablet shows, and when, is set per tablet on the hub (household platform doc, §06).</p>
+  </section>
+
+  <section id="shipping">
+    <div class="eyebrow">Changing the shell</div>
+    <h2>Tag it, install it, deploy the hub first</h2>
+    <ol class="steps">
+      <li>Change <code>cornerways.design</code>, check it in the preview site, then tag it: <code>git tag vX.Y.Z &amp;&amp; git push --tags</code>.</li>
+      <li>In each app: <code>npm install "@cornerways/design@git+https://github.com/iocornerways/cornerways.design.git#vX.Y.Z"</code>, then clear <code>node_modules/.vite</code> before restarting the dev server. Editing the tag in <code>package.json</code> by hand isn't enough.</li>
+      <li>Deploy the hub first, then the apps.</li>
+    </ol>
+  </section>
+
+  <footer><span>cornerways / style-guide / rev B / 2026-10-17</span><span>Source: <code>cornerways.design/docs/style-guide.md</code></span></footer>
+</main>
+
+<script>
+(function () {
+  function toggle(el) { el.setAttribute("aria-pressed", String(el.getAttribute("aria-pressed") !== "true")); }
+  ["ib1", "p1", "p2"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("click", function () { toggle(el); });
+  });
+  var seg = document.getElementById("seg1");
+  if (seg) seg.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+  });
+})();
+</script>

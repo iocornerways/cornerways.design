@@ -1,14 +1,21 @@
 # cornerways.design
 
 The shared shell for every Cornerways site: design tokens, fonts, the two
-layout modes, and (from Step 2) the header and controls. Implemented once here
-and imported by each app, so nothing is copied.
+layout modes, the header and controls. Implemented once here and imported by
+each app, so nothing is copied.
+
+The rules for how the sites look and behave are in the
+[style guide](docs/style-guide.md).
 
 ## Using it in an app
 
 ```sh
-npm install ../cornerways.design      # file: dependency while this repo is local
+npm install "@cornerways/design@git+https://github.com/iocornerways/cornerways.design.git#vX.Y.Z"
 ```
+
+To ship a shell change: tag this repo (`git tag vX.Y.Z && git push --tags`),
+reinstall at the new tag in each app, then clear `node_modules/.vite` before
+restarting its dev server. Deploy the hub first, then the apps.
 
 Then, at the top of the app's main stylesheet:
 
