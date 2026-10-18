@@ -305,8 +305,8 @@ const HOME_CSS = `
   /* The app's accent, darkened (or lightened, in dark) enough to read as text. */
   .home { --home-accent-text: color-mix(in srgb, var(--home-accent) 80%, black); }
   :root[data-theme="dark"] .home, .home [data-cw-theme="dark"] { --home-accent-text: color-mix(in srgb, var(--home-accent) 55%, white); }
-  /* Aligned to the header's gutter, as a Workspace app is; held to a width that reads. */
-  .home-inner { max-width: 1180px; }
+  /* A centred column, held to a width that reads; narrower screens keep the header's gutter. */
+  .home-inner { max-width: calc(1180px + 2 * var(--cw-gutter)); margin-inline: auto; }
   .home p a { color: var(--cw-brand-text); }
   .home :focus-visible { outline: 2px solid var(--home-accent-text); outline-offset: 2px; }
   .home h1, .home h2, .home h3 { font-family: var(--cw-font-display); font-weight: 600; text-wrap: balance; margin: 0; }
