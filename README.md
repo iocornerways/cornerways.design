@@ -52,7 +52,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 
 | Import | File | Contents |
 |---|---|---|
-| `@cornerways/design` | `src/index.ts` | The client shell: `Header`, controls, layouts, `Mark`, `APP_ICONS`, `ICON_STROKE`, `THEMES`, `GOOGLE_FONTS_HREF`, and the app registry (`APPS`, `appUrl`, `hubUrl`, `familyHosts`) |
+| `@cornerways/design` | `src/index.ts` | The client shell: `Header`, controls, layouts, `PageTitle`, `Mark`, `APP_ICONS`, `ICON_STROKE`, `THEMES`, `GOOGLE_FONTS_HREF`, the hooks below, and the app registry (`APPS`, `appUrl`, `hubUrl`, `familyHosts`) |
 | `…/styles.css` | `src/styles.css` | Imports `fonts.css`, `tokens.css`, `base.css` and `components.css`; each is also importable alone |
 | | `src/tokens.css` | Colours (light and dark), per-app accents, sizes, radii, shadows, z-index (`--cw-*`) |
 | | `src/fonts.css`, `src/fonts.ts` | Font-family tokens for Figtree (UI) and Source Serif 4 (display), and the Google Fonts href |
@@ -60,7 +60,8 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | | `src/components.css` | Styles for the header, menus, buttons, pills, segmented controls, toolbar, app chips and footer (`.cw-*`) |
 | | `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
 | | `src/Header.tsx`, `src/useMenu.ts` | `<Header>`, and the keyboard and outside-tap behaviour its menus share |
-| | `src/controls.tsx`, `src/layout.tsx`, `src/Mark.tsx`, `src/theme.ts` | Buttons and other controls, `<Workspace>` / `<Reading>`, the mark, the theme names |
+| | `src/controls.tsx`, `src/layout.tsx`, `src/PageTitle.tsx`, `src/Mark.tsx` | Buttons and other controls, `<Workspace>` / `<Reading>`, `<PageTitle>`, the mark |
+| | `src/theme.ts`, `src/useTheme.ts`, `src/session.ts` | The theme names and `useTheme`; `useSession`, `useFamilyMembers` and `throwIfNotOk` |
 | `…/auth` | `src/auth.ts` | Server-only. Sessions (verified with the hub's public key), the live check against the hub, roles and scope, device policy, the cross-site write guard (`originGuard`), the no-access page and `hubOrigin` |
 | `…/agent` | `src/agent.ts` | Server-only. The shape of each app's agent tools and the checks every tool call goes through |
 | `…/flags` | `src/flags.ts` | Server-only feature flags: `resolveFlags(env, context, names)` asks the Confidence resolver Worker (binding `CONFIDENCE`) and `flags.get("flag.property", fallback)` reads the answer; any failure gives the fallback, and `FLAG_OVERRIDES` (JSON) is the instant kill switch |
@@ -77,7 +78,7 @@ root entry is for client code.
 
 ```tsx
 import { Header, Toolbar, Segmented, Button, IconButton, Pill, Footer, Workspace } from "@cornerways/design";
-import { useTheme } from "./hooks/useTheme.ts";
+import { useTheme } from "@cornerways/design";
 
 const { theme, setTheme } = useTheme();
 
@@ -104,7 +105,18 @@ const { theme, setTheme } = useTheme();
 - **Toolbar.** The 60px row under the header, same gutter; children start left, `end` pins right. `<ToolbarDivider />` between groups.
 - **SegmentedMulti.** The same track with any number of segments on at once, for filters (people, statuses); options take an optional colour `dot`.
 - **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default; hidden below 640px.
+- **PageTitle.** A sub-page's heading (`.cw-page-title`), with an optional back button: `<PageTitle title="Settings" onBack={…} />`.
 - **Icons.** lucide-react at `ICON_STROKE` (1.7), 18px in controls. `APP_ICONS[key]` is the app's line icon.
+
+## Hooks and helpers
+
+For an app's client, against its own worker's routes:
+
+- `useTheme()`: `{ theme, resolvedTheme, setTheme, cycleTheme }`, shared across every site through the `cw_theme` cookie and applied as `<html data-theme>`.
+- `useSession()`: who's signed in, from `GET /api/session` (`{ memberId, role, scope }`).
+- `useFamilyMembers()`: the household's members, from `GET /api/family-members`, retried twice.
+- `throwIfNotOk(res, fallback)`: throws the server's own `{ error }` message, else the fallback.
+- `hubUrl(location.hostname)`: the hub for this deployment (dev server, test or production).
 
 ## Installing as an app
 

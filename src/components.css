@@ -320,6 +320,28 @@
   flex-shrink: 0;
 }
 
+/* ---------- Page title ---------- */
+
+/* A sub-page's heading, with an optional back button (<PageTitle>). */
+.cw-page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--cw-control-h);
+}
+
+.cw-page-title-text {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--cw-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 /* ---------- Buttons ---------- */
 
 .cw-button,
