@@ -19,7 +19,7 @@
  */
 import type { Context, MiddlewareHandler } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { APPS, familyHosts, householdAppKeys } from "./apps.ts";
+import { APPS, PRIVATE_LAN_HOSTNAME, familyHosts, householdAppKeys } from "./apps.ts";
 
 /** What a Worker needs in its env for any of this. */
 export type AuthEnv = {
@@ -442,12 +442,12 @@ export function originGuard(options: OriginGuardOptions = {}): MiddlewareHandler
   };
 }
 
-export { APPS, familyHosts, householdAppKeys };
+export { APPS, PRIVATE_LAN_HOSTNAME, familyHosts, householdAppKeys };
 
 // ---------- Roles ----------
 // owner / editor / viewer / none (docs/architecture/permissions.md in the
-// cornerways repo). No app has per-app overrides yet, so the household role
-// is the effective role everywhere.
+// cornerways repo). The household role is the default; the hub's live check
+// returns a member's role in this app, which may differ (member_app_roles).
 
 /** A paired kiosk tablet, signed in as itself rather than as a person (see the hub's device pairing). */
 export function isDevice(session: { memberId: string }): boolean {
@@ -517,9 +517,6 @@ export function checkTagChange(
 
 // ---------- Where the hub is ----------
 
-/** A phone or laptop on the household Wi-Fi reaching a dev server by LAN IP. */
-export const PRIVATE_LAN_HOSTNAME =
-  /^(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})$/;
 
 /**
  * The hub's origin as seen from this Worker. Keyed off ENVIRONMENT, not the

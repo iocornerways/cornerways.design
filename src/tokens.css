@@ -6,9 +6,8 @@
    Themes: light is the default. Dark applies when <html data-theme="dark">
    (every app's theme script sets that attribute), and also for the legacy
    <html class="dark"> that home.cornerways still sets until it moves over.
-   color-scheme is left to each app for now: the shell will own it once the
-   per-app token blocks go (Step 3 onward), not before, so importing this
-   file stays invisible.
+   color-scheme is left to each app, so importing this file changes nothing
+   until an app uses the tokens.
 
    [data-cw-theme="light|dark"] scopes a theme to one subtree — for a preview
    that shows both at once, or a deliberately dark panel on a light page. */
@@ -67,9 +66,6 @@
   --cw-radius-card: 12px;
   --cw-radius-card-lg: 16px;
   --cw-radius-pill: 999px;
-
-  /* Icons: line style */
-  --cw-icon-stroke: 1.7;
 
   /* Stacking */
   --cw-z-header: 40;

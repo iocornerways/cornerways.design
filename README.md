@@ -10,12 +10,22 @@ The rules for how the sites look and behave are in the
 ## Using it in an app
 
 ```sh
-npm install "@cornerways/design@git+https://github.com/iocornerways/cornerways.design.git#vX.Y.Z"
+npm install "github:iocornerways/cornerways.design#vX.Y.Z"
 ```
 
-To ship a shell change: tag this repo (`git tag vX.Y.Z && git push --tags`),
-reinstall at the new tag in each app, then clear `node_modules/.vite` before
-restarting its dev server. Deploy the hub first, then the apps.
+Every app pins a tag this way (`"@cornerways/design": "github:iocornerways/cornerways.design#vX.Y.Z"`).
+The repo is public so CI's `npm ci` can fetch it without credentials; it
+holds no secrets (the session keys in `auth.ts` are public keys).
+
+To ship a change:
+
+1. Bump `version` in `package.json`, commit, then tag and push (`git tag vX.Y.Z && git push && git push --tags`).
+2. In each app, run the install above with the new tag. Editing the tag in `package.json` by hand leaves the lockfile on the old commit.
+3. Clear the app's `node_modules/.vite` before restarting its dev server.
+4. Deploy the hub first, then the apps.
+
+The package ships TypeScript and TSX source, not a build: each app's own
+Vite and Wrangler compile it.
 
 Then, at the top of the app's main stylesheet:
 
@@ -40,20 +50,28 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 
 ## What's here
 
-| File | Contents |
-|---|---|
-| `src/fonts.css`, `src/fonts.ts` | Font-family tokens for Figtree (UI) and Source Serif 4 (display) with system-ui and Georgia fallbacks, and the Google Fonts href |
-| `src/tokens.css` | Colours (light and dark), per-app accents, sizes, radii, shadows, z-index |
-| `src/base.css` | `.cw-workspace` and `.cw-reading` layout wrappers |
-| `src/components.css` | Styles for the header, menus, buttons, pills, segmented control, toolbar and footer (`.cw-*`) |
-| `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
-| `src/layout.tsx` | `<Workspace>` and `<Reading>` components |
-| `src/Header.tsx` | `<Header>`: breadcrumb app switcher, page-actions slot, account menu |
-| `src/controls.tsx` | `<Button>`, `<IconButton>`, `<Pill>`, `<Segmented>`, `<Toolbar>`, `<Footer>` |
-| `src/install/` | Install support: `install.js` + `install.css` (the "Install app" card, framework-free), `pwa.js` (Vite plugin emitting `/sw.js`, with the offline page built in), `sw-core.js` and `offline.html` (its templates) |
-| `src/flags.ts` (`@cornerways/design/flags`) | Server-only feature flags: `resolveFlags(env, context, names)` asks the Confidence resolver Worker (service binding `CONFIDENCE`) and `flags.get("flag.property", fallback)` reads the answer; any failure gives the fallback, and `FLAG_OVERRIDES` (JSON) is the instant kill switch |
-| `src/returnBar.ts` | `initReturnBar()`: a "← Back to …" bar when another family page opened this app with `?return_to=` (the hub's /welcome does), checked against the family's hosts |
-| `preview-site/` | Every component in both themes plus a 390px frame: `npm run preview` |
+| Import | File | Contents |
+|---|---|---|
+| `@cornerways/design` | `src/index.ts` | The client shell: `Header`, controls, layouts, `Mark`, `APP_ICONS`, `ICON_STROKE`, `THEMES`, `GOOGLE_FONTS_HREF`, and the app registry (`APPS`, `appUrl`, `hubUrl`, `familyHosts`) |
+| `…/styles.css` | `src/styles.css` | Imports `fonts.css`, `tokens.css`, `base.css` and `components.css`; each is also importable alone |
+| | `src/tokens.css` | Colours (light and dark), per-app accents, sizes, radii, shadows, z-index (`--cw-*`) |
+| | `src/fonts.css`, `src/fonts.ts` | Font-family tokens for Figtree (UI) and Source Serif 4 (display), and the Google Fonts href |
+| | `src/base.css` | `.cw-workspace` (and `--flush`, with no padding) and `.cw-reading` layout wrappers |
+| | `src/components.css` | Styles for the header, menus, buttons, pills, segmented controls, toolbar, app chips and footer (`.cw-*`) |
+| | `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
+| | `src/Header.tsx`, `src/useMenu.ts` | `<Header>`, and the keyboard and outside-tap behaviour its menus share |
+| | `src/controls.tsx`, `src/layout.tsx`, `src/Mark.tsx`, `src/theme.ts` | Buttons and other controls, `<Workspace>` / `<Reading>`, the mark, the theme names |
+| `…/auth` | `src/auth.ts` | Server-only. Sessions (verified with the hub's public key), the live check against the hub, roles and scope, device policy, the cross-site write guard (`originGuard`), the no-access page and `hubOrigin` |
+| `…/agent` | `src/agent.ts` | Server-only. The shape of each app's agent tools and the checks every tool call goes through |
+| `…/flags` | `src/flags.ts` | Server-only feature flags: `resolveFlags(env, context, names)` asks the Confidence resolver Worker (binding `CONFIDENCE`) and `flags.get("flag.property", fallback)` reads the answer; any failure gives the fallback, and `FLAG_OVERRIDES` (JSON) is the instant kill switch |
+| `…/telemetry` | `src/telemetry.ts` | Server-only. Counts (never content) to the Analytics Engine dataset Mission Control reads |
+| `…/install`, `…/install.css`, `…/pwa` | `src/install/` | Installing as an app: the install card, and a Vite plugin that writes `/sw.js` with the offline page built in |
+| `…/return-bar` | `src/returnBar.ts` | `initReturnBar()`: a "← Back to …" bar when another family page opened this app with `?return_to=`, checked against the family's hosts |
+| | `preview-site/` | The components in both themes plus a 390px frame: `npm run preview` |
+| | `docs/` | The [style guide](docs/style-guide.md) and its visual copy |
+
+Server-only entry points never import React, so Workers can use them; the
+root entry is for client code.
 
 ## Components
 
@@ -69,6 +87,7 @@ const { theme, setTheme } = useTheme();
   theme={{ value: theme, onChange: setTheme }}
   settingsHref="/settings" onSettings={() => navigate("/settings")}
   logout={{ formAction: "/logout" }}           // or { onSelect: () => … }
+  householdHref={null}                         // optional: null hides Household (a guest)
   actions={<IconButton label="Meetups"><Users size={18} strokeWidth={1.7} /></IconButton>}
 />
 <Toolbar end={<Button variant="primary" icon={<Plus size={18} strokeWidth={1.7} />}>Add entry</Button>}>
@@ -107,10 +126,6 @@ initInstallPrompt({ appName: "Todo" });
 - **Public paths.** Add `/sw.js` to the site's `PUBLIC_PATHS`, so the browser can fetch it signed out.
 - **The hub** has no bundler: its sync script copies `install.js` and renders `sw.js` with the same function.
 
-## Consuming the TSX from an app
-
-The package ships source, not a build. While it is a `file:` link, the app's Vite needs `resolve.dedupe: ["react", "react-dom", "lucide-react"]` so the linked source resolves React from the app, not from this repo's `node_modules`. A git dependency has no such need.
-
 ## Layout modes
 
 - **Workspace**: content is full width, padded by `--cw-gutter` (24px, 16px on phones) so it lines up with the header.
@@ -118,4 +133,4 @@ The package ships source, not a build. While it is a `file:` link, the app's Vit
 
 ## Themes
 
-Light is the default. Dark applies under `html[data-theme="dark"]`, which every app's theme script already sets from the shared `cw_theme` cookie.
+Light is the default. Dark applies under `html[data-theme="dark"]`, which every app's theme script sets from the shared `cw_theme` cookie. `html.dark` also works, for Home, which still sets the class. `[data-cw-theme="light|dark"]` scopes a theme to one part of a page.

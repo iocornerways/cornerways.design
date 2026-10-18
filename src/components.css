@@ -320,12 +320,6 @@
   flex-shrink: 0;
 }
 
-.cw-app-chip--lg {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-}
-
 /* ---------- Buttons ---------- */
 
 .cw-button,
@@ -434,7 +428,6 @@
   border-color: var(--cw-muted);
 }
 
-.cw-pill--active,
 .cw-pill[aria-pressed="true"] {
   border-color: color-mix(in srgb, var(--cw-brand) 40%, transparent);
   background: var(--cw-brand-soft);

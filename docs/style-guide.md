@@ -2,7 +2,7 @@
 
 **Current — Rev B, 2026-10-17**
 
-How every Cornerways site looks and behaves. The rules are short because the shell is built once, in this package (`@cornerways/design`, v0.17.0), and imported by every app. The [README](../README.md) has the component API, and `npm run preview` shows every component in both themes.
+How every Cornerways site looks and behaves. The rules are short because the shell is built once, in this package (`@cornerways/design`, v0.17.2), and imported by every app. The [README](../README.md) has the component API, and `npm run preview` shows the components in both themes.
 
 > Visual copy: [Claude artifact AEbjBUxc](https://claude.ai/artifact/AEbjBUxcKrJu8ABMRbmraf) (source: `docs/style-guide.html`). Update both when the guide changes.
 

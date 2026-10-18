@@ -9,4 +9,3 @@
 export const GOOGLE_FONTS_HREF =
   "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap";
 
-export const FONT_PRECONNECT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"] as const;
