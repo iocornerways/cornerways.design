@@ -436,7 +436,7 @@ export function originGuard(options: OriginGuardOptions = {}): MiddlewareHandler
 export { APPS, familyHosts, householdAppKeys };
 
 // ---------- Roles ----------
-// owner / editor / viewer / none (docs/household-platform.md §05 in the
+// owner / editor / viewer / none (docs/architecture/permissions.md in the
 // cornerways repo). No app has per-app overrides yet, so the household role
 // is the effective role everywhere.
 
