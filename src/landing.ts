@@ -59,6 +59,13 @@ export interface LandingFeature {
   icon: IconNode;
 }
 
+/** A link on the page: text before it (optional), then the link. Same-site paths or https only. */
+export interface LandingLink {
+  text?: string;
+  label: string;
+  href: string;
+}
+
 export interface LandingPageOptions {
   app: AppKey;
   /** The page's main heading. */
@@ -72,6 +79,10 @@ export interface LandingPageOptions {
   signInUrl: string;
   /** From the shared cw_theme cookie; light unless it says dark. */
   theme?: "light" | "dark";
+  /** Quiet lines under the Sign in button, e.g. another way in during a changeover. */
+  links?: LandingLink[];
+  /** The footer's own words (e.g. a data credit) and links (e.g. Privacy), instead of the family's line. */
+  footer?: { note?: string; links?: LandingLink[] };
 }
 
 function escapeHtml(value: string): string {
@@ -109,6 +120,23 @@ function safeSignIn(value: string): URL {
   return new URL("https://cornerways.io/login");
 }
 
+/** A same-site path ("/privacy") or an https link; anything else isn't linked. */
+function safeHref(value: string): string | null {
+  if (value.startsWith("/") && !value.startsWith("//") && !value.includes("\\")) return value;
+  try {
+    return new URL(value).protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function linkHtml(link: LandingLink): string {
+  const href = safeHref(link.href);
+  const label = escapeHtml(link.label);
+  const anchor = href ? `<a href="${escapeHtml(href)}">${label}</a>` : label;
+  return link.text ? `${escapeHtml(link.text)} ${anchor}` : anchor;
+}
+
 const PAGE_CSS = `
   body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--cw-canvas); color: var(--cw-ink); font-family: var(--cw-font-ui); -webkit-font-smoothing: antialiased; }
   a { color: inherit; }
@@ -121,6 +149,9 @@ const PAGE_CSS = `
   .landing-intro p { margin: 0; color: var(--cw-muted); font-size: 18px; line-height: 1.55; }
   .landing-intro .landing-note { font-size: 15px; }
   .landing-intro .cw-button { justify-self: start; text-decoration: none; }
+  .landing-intro .landing-link { font-size: 14px; }
+  .landing-intro .landing-link a, .cw-footer .landing-footer-links a { color: var(--cw-brand-text); }
+  .landing-footer-links { display: inline-flex; gap: 16px; }
   .landing-features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
   .landing-feature { display: flex; gap: 14px; min-width: 0; padding: 20px; border: 1px solid var(--cw-border-soft); border-radius: var(--cw-radius-card-lg); background: var(--cw-surface); box-shadow: var(--cw-shadow-1); }
   .landing-feature .cw-app-chip { flex: none; }
@@ -210,14 +241,15 @@ ${PAGE_CSS}
       <p>${escapeHtml(options.intro)}</p>
       ${options.note ? `<p class="landing-note">${escapeHtml(options.note)}</p>` : ""}
       <a class="cw-button cw-button--primary" href="${href}">Sign in to ${name}</a>
+      ${(options.links ?? []).map((link) => `<p class="landing-link">${linkHtml(link)}</p>`).join("\n      ")}
     </section>
     <ul class="landing-features" aria-label="What ${name} does">
         ${features}
     </ul>
   </main>
   <footer class="cw-footer cw-reading">
-    <span>Cornerways &mdash; built for family and friends.</span>
-    <span>Est. 2026</span>
+    <span>${options.footer?.note ? escapeHtml(options.footer.note) : "Cornerways &mdash; built for family and friends."}</span>
+    <span class="landing-footer-links">${(options.footer?.links ?? []).map((link) => linkHtml(link)).join("")}<span>Est. 2026</span></span>
   </footer>
 </body>
 </html>`;
