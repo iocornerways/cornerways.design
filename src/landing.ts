@@ -25,7 +25,7 @@ import {
   UtensilsCrossed,
   type IconNode,
 } from "lucide";
-import { APPS, PRIVATE_LAN_HOSTNAME, type AppKey } from "./apps.ts";
+import { APPS, PRIVATE_LAN_HOSTNAME, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
 import { GOOGLE_FONTS_HREF } from "./fonts.ts";
 import tokensCss from "./tokens.css?raw";
 import fontsCss from "./fonts.css?raw";
@@ -181,33 +181,18 @@ export function isPageLoad(headers: { get(name: string): string | null }): boole
   return (headers.get("accept") ?? "").includes("text/html");
 }
 
-/** The whole page, as an HTML string, ready for `c.html(...)`. */
-export function renderLandingPage(options: LandingPageOptions): string {
-  const app = APPS.find((entry) => entry.key === options.app);
-  if (!app) throw new Error(`Unknown Cornerways app: ${options.app}`);
-  const signIn = safeSignIn(options.signInUrl);
-  const hub = signIn.origin;
-  const dark = options.theme === "dark";
-  const chip = (icon: IconNode, size: number) =>
-    `<span class="cw-app-chip" style="--cw-app-accent: ${app.accent}">${svg(icon, size)}</span>`;
-  const features = options.features
-    .map(
-      (feature) =>
-        `<li class="landing-feature">${chip(feature.icon, 18)}<div><h2>${escapeHtml(feature.title)}</h2><p>${escapeHtml(feature.text)}</p></div></li>`,
-    )
-    .join("\n        ");
-  const name = escapeHtml(app.name);
-  const href = escapeHtml(signIn.toString());
-
+/** The document up to and including the shared header: the shell's CSS inlined, then the page's own. */
+function documentStart(page: { app: AppDefinition; hub: string; href: string; dark: boolean; description: string; css: string }): string {
+  const name = escapeHtml(page.app.name);
   return `<!doctype html>
-<html lang="en-GB"${dark ? ' data-theme="dark"' : ""}>
+<html lang="en-GB"${page.dark ? ' data-theme="dark"' : ""}>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${name} — Cornerways</title>
-<meta name="description" content="${escapeHtml(options.intro)}" />
+<meta name="description" content="${escapeHtml(page.description)}" />
 <meta name="robots" content="noindex, nofollow" />
-<meta name="theme-color" content="${dark ? "#1a1816" : "#f6f4f0"}" />
+<meta name="theme-color" content="${page.dark ? "#1a1816" : "#f6f4f0"}" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -217,13 +202,13 @@ ${tokensCss}
 ${fontsCss}
 ${baseCss}
 ${componentsCss}
-${PAGE_CSS}
+${page.css}
 </style>
 </head>
 <body>
   <header class="cw-header">
     <div class="cw-header-left">
-      <a class="cw-brand" href="${escapeHtml(hub)}" aria-label="Cornerways home">
+      <a class="cw-brand" href="${escapeHtml(page.hub)}" aria-label="Cornerways home">
         <span class="cw-brand-mark">${MARK}</span>
         <span class="cw-wordmark">Cornerways</span>
       </a>
@@ -231,9 +216,33 @@ ${PAGE_CSS}
       <span class="cw-header-app">${name}</span>
     </div>
     <div class="cw-header-right">
-      <a class="cw-button cw-button--ghost" href="${href}">Sign in</a>
+      <a class="cw-button cw-button--ghost" href="${page.href}">Sign in</a>
     </div>
-  </header>
+  </header>`;
+}
+
+function appChip(app: AppDefinition, icon: IconNode, size: number): string {
+  return `<span class="cw-app-chip" style="--cw-app-accent: ${app.accent}">${svg(icon, size)}</span>`;
+}
+
+/** The whole page, as an HTML string, ready for `c.html(...)`. */
+export function renderLandingPage(options: LandingPageOptions): string {
+  const app = APPS.find((entry) => entry.key === options.app);
+  if (!app) throw new Error(`Unknown Cornerways app: ${options.app}`);
+  const signIn = safeSignIn(options.signInUrl);
+  const hub = signIn.origin;
+  const dark = options.theme === "dark";
+  const chip = (icon: IconNode, size: number) => appChip(app, icon, size);
+  const features = options.features
+    .map(
+      (feature) =>
+        `<li class="landing-feature">${chip(feature.icon, 18)}<div><h2>${escapeHtml(feature.title)}</h2><p>${escapeHtml(feature.text)}</p></div></li>`,
+    )
+    .join("\n        ");
+  const name = escapeHtml(app.name);
+  const href = escapeHtml(signIn.toString());
+
+  return `${documentStart({ app, hub, href, dark, description: options.intro, css: PAGE_CSS })}
   <main class="cw-reading">
     <section class="landing-intro">
       ${chip(APP_ICON_NODES[app.key], 28)}
@@ -251,6 +260,210 @@ ${PAGE_CSS}
     <span>${options.footer?.note ? escapeHtml(options.footer.note) : "Cornerways &mdash; built for family and friends."}</span>
     <span class="landing-footer-links">${(options.footer?.links ?? []).map((link) => linkHtml(link)).join("")}<span>Est. 2026</span></span>
   </footer>
+</body>
+</html>`;
+}
+
+/* ---------- The fuller home page ---------- */
+
+/** One of the "how it's used" blocks: a small picture, a heading and a paragraph. */
+export interface AppHomeStory {
+  title: string;
+  text: string;
+  /** A small illustrative picture, as HTML from the app's own code (never user input). Sample data only. */
+  visual: string;
+}
+
+export interface AppHomePageOptions {
+  app: AppKey;
+  headline: string;
+  /** Under the headline. */
+  subtitle: string;
+  /** One more, quieter line. */
+  supporting?: string;
+  /** The hub's sign-in, with a redirect back here; built by the app. */
+  signInUrl: string;
+  /** From the shared cw_theme cookie; light unless it says dark. */
+  theme?: "light" | "dark";
+  /** The hero's main action, usually a jump to the slot ("#try"). Sign in sits beside it. */
+  action?: { label: string; href: string };
+  /** The hero's other half, e.g. a live demo: HTML from the app's own code, given this id. */
+  slot?: { id: string; html: string };
+  stories: { heading: string; note?: string; items: AppHomeStory[] };
+  /** Other apps this one passes things to, each with a line on what. */
+  worksWith?: { heading: string; intro: string; apps: Array<{ app: AppKey; text: string }> };
+  /** CSS for the slot and the pictures, from the app's own code. */
+  css?: string;
+  /** Same-site module scripts to load, e.g. the demo's. */
+  scripts?: string[];
+}
+
+const HOME_CSS = `
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--cw-canvas); color: var(--cw-ink); font-family: var(--cw-font-ui); -webkit-font-smoothing: antialiased; }
+  .cw-header-app { font-size: 15px; font-weight: 600; white-space: nowrap; }
+  main { flex: 1; }
+  /* The app's accent, darkened (or lightened, in dark) enough to read as text. */
+  .home { --home-accent-text: color-mix(in srgb, var(--home-accent) 80%, black); }
+  :root[data-theme="dark"] .home, .home [data-cw-theme="dark"] { --home-accent-text: color-mix(in srgb, var(--home-accent) 55%, white); }
+  /* Aligned to the header's gutter, as a Workspace app is; held to a width that reads. */
+  .home-inner { max-width: 1180px; }
+  .home p a { color: var(--cw-brand-text); }
+  .home :focus-visible { outline: 2px solid var(--home-accent-text); outline-offset: 2px; }
+  .home h1, .home h2, .home h3 { font-family: var(--cw-font-display); font-weight: 600; text-wrap: balance; margin: 0; }
+  .home p { margin: 0; }
+  .home-muted { color: var(--cw-muted); }
+  .home-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .home-actions .cw-button { height: auto; min-height: 48px; padding: 0 22px; font-size: 16px; font-weight: 600; }
+
+  .home-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 40px 56px; padding-block: 56px 64px; }
+  .home-hero-text { flex: 1 1 420px; min-width: 0; max-width: 560px; display: grid; gap: 16px; justify-items: start; }
+  .home-hero-text .cw-app-chip { width: 60px; height: 60px; border-radius: 16px; margin-bottom: 8px; }
+  .home-hero h1 { font-size: clamp(34px, 5.2vw, 54px); line-height: 1.08; letter-spacing: -0.01em; }
+  .home-subtitle { font-size: 20px; line-height: 1.5; color: var(--cw-muted); }
+  .home-supporting { font-size: 16px; line-height: 1.6; color: var(--cw-muted); }
+  .home-hero .home-actions { margin-top: 12px; }
+  .home-beta-line { margin-top: 8px; font-size: 15px; line-height: 1.6; color: var(--cw-muted); }
+  .home-slot { flex: 1 1 440px; min-width: 0; max-width: 560px; scroll-margin-top: calc(var(--cw-header-h) + 16px); }
+
+  .home-band { background: var(--cw-header-surface); border-block: 1px solid var(--cw-border-soft); }
+  .home-section { padding-block: 64px; }
+  .home-section > h2 { font-size: clamp(28px, 3.6vw, 38px); line-height: 1.15; }
+  .home-section-intro { margin-top: 8px; font-size: 16px; line-height: 1.6; color: var(--cw-muted); max-width: 560px; }
+  .home-cards { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 32px; padding: 0; list-style: none; }
+
+  .home-story { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 20px; padding: 20px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 20px; box-shadow: var(--cw-shadow-1); }
+  .home-visual { display: flex; flex-direction: column; justify-content: center; gap: 10px; min-height: 236px; padding: 14px; background: var(--cw-canvas); border-radius: 14px; box-sizing: border-box; }
+  .home-story h3 { font-size: 23px; line-height: 1.2; margin-bottom: 8px; }
+  .home-story p { font-size: 16px; line-height: 1.6; color: var(--cw-muted); }
+
+  .home-link-card { flex: 1 1 320px; min-width: 0; display: flex; gap: 16px; align-items: flex-start; padding: 20px; color: var(--cw-ink); background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: var(--cw-radius-card-lg); text-decoration: none; transition: border-color var(--cw-ease); }
+  .home-link-card:hover { border-color: var(--cw-muted); }
+  .home-link-card .cw-app-chip { width: 48px; height: 48px; border-radius: 14px; }
+  .home-link-name { font-family: var(--cw-font-display); font-size: 20px; font-weight: 600; }
+  .home-link-text { display: block; margin-top: 4px; font-size: 15px; line-height: 1.5; color: var(--cw-muted); }
+  .home-link-go { display: block; margin-top: 10px; font-size: 15px; font-weight: 600; color: var(--cw-brand-text); }
+
+  .home-beta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; margin-bottom: 64px; padding: 44px 48px; background: var(--cw-surface); color: var(--cw-ink); border: 1px solid var(--cw-border-soft); border-radius: 24px; }
+  .home-beta > div:first-child { flex: 1 1 380px; min-width: 0; display: grid; gap: 10px; }
+  .home-beta h2 { font-size: clamp(28px, 3.4vw, 34px); line-height: 1.15; }
+  .home-beta p { font-size: 16px; line-height: 1.6; color: var(--cw-muted); max-width: 520px; }
+
+  .home-footer.cw-footer { flex-wrap: wrap; gap: 10px 24px; padding-block: 24px 28px; font-size: 14px; }
+  .home-footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+  .home-footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 639.98px) {
+    .home-hero { padding-block: 32px 44px; }
+    .home-subtitle { font-size: 18px; }
+    .home-section { padding-block: 48px; }
+    .home-beta { padding: 28px 22px; margin-bottom: 44px; }
+    .home-actions .cw-button { flex: 1 1 auto; }
+    /* The shell hides its footer on phones; here it holds Privacy and the contact address. */
+    .home-footer.cw-footer { display: flex; }
+  }
+`;
+
+/**
+ * The fuller home page: a hero with a slot for something to try, how the app
+ * is used, the apps it works with, and how to get Cornerways for your own
+ * household. Built from the app's own words and pictures; the beta lines and
+ * the footer are the family's, the same on every app.
+ */
+export function renderAppHomePage(options: AppHomePageOptions): string {
+  const app = APPS.find((entry) => entry.key === options.app);
+  if (!app) throw new Error(`Unknown Cornerways app: ${options.app}`);
+  const signIn = safeSignIn(options.signInUrl);
+  const hub = signIn.origin;
+  const href = escapeHtml(signIn.toString());
+  const name = escapeHtml(app.name);
+  const hubLink = (path: string) => escapeHtml(`${hub}${path}`);
+  // A jump within the page ("#try") or a same-site or https link.
+  const actionHref = options.action && (/^#[\w-]+$/.test(options.action.href) ? options.action.href : safeHref(options.action.href));
+
+  const hero = `<section class="home-hero cw-workspace home-inner" aria-labelledby="home-title">
+      <div class="home-hero-text">
+        ${appChip(app, APP_ICON_NODES[app.key], 30)}
+        <h1 id="home-title">${escapeHtml(options.headline)}</h1>
+        <p class="home-subtitle">${escapeHtml(options.subtitle)}</p>
+        ${options.supporting ? `<p class="home-supporting">${escapeHtml(options.supporting)}</p>` : ""}
+        <div class="home-actions">
+          ${options.action && actionHref ? `<a class="cw-button cw-button--primary" href="${escapeHtml(actionHref)}">${escapeHtml(options.action.label)}</a>` : ""}
+          <a class="cw-button${actionHref ? "" : " cw-button--primary"}" href="${href}">Sign in to ${name}</a>
+        </div>
+        <p class="home-beta-line">Want it for your own family? If you have a beta code, <a href="${hubLink("/signup/")}">create your household</a>. Otherwise, <a href="${hubLink("/signup/?request=1")}">ask for one</a>.</p>
+      </div>
+      ${options.slot ? `<div class="home-slot" id="${escapeHtml(options.slot.id)}">${options.slot.html}</div>` : ""}
+    </section>`;
+
+  const stories = `<section class="home-band" aria-labelledby="home-stories">
+      <div class="home-section cw-workspace home-inner">
+        <h2 id="home-stories">${escapeHtml(options.stories.heading)}</h2>
+        ${options.stories.note ? `<p class="home-section-intro">${escapeHtml(options.stories.note)}</p>` : ""}
+        <ul class="home-cards">
+          ${options.stories.items
+            .map(
+              (story) => `<li class="home-story">
+            <div class="home-visual">${story.visual}</div>
+            <div><h3>${escapeHtml(story.title)}</h3><p>${escapeHtml(story.text)}</p></div>
+          </li>`,
+            )
+            .join("\n          ")}
+        </ul>
+      </div>
+    </section>`;
+
+  const worksWith = options.worksWith
+    ? `<section class="home-section cw-workspace home-inner" aria-labelledby="home-works-with">
+      <h2 id="home-works-with">${escapeHtml(options.worksWith.heading)}</h2>
+      <p class="home-section-intro">${escapeHtml(options.worksWith.intro)}</p>
+      <div class="home-cards">
+        ${options.worksWith.apps
+          .map(({ app: key, text }) => {
+            const other = APPS.find((entry) => entry.key === key);
+            if (!other) throw new Error(`Unknown Cornerways app: ${key}`);
+            return `<a class="home-link-card" href="${escapeHtml(appUrl(other, signIn.hostname))}/">
+          ${appChip(other, APP_ICON_NODES[other.key], 24)}
+          <span><span class="home-link-name">${escapeHtml(other.name)}</span><span class="home-link-text">${escapeHtml(text)}</span><span class="home-link-go">See ${escapeHtml(other.name)} <span aria-hidden="true">&rarr;</span></span></span>
+        </a>`;
+          })
+          .join("\n        ")}
+      </div>
+    </section>`
+    : "";
+
+  const beta = `<section class="cw-workspace home-inner" aria-labelledby="home-beta">
+      <div class="home-beta" data-cw-theme="dark">
+        <div>
+          <h2 id="home-beta">Want this for your family?</h2>
+          <p>Cornerways is in beta and built to a few simple <a href="${hubLink("/principles/")}">principles</a>. If you have a code, create your household. If not, ask for one.</p>
+        </div>
+        <div class="home-actions">
+          <a class="cw-button cw-button--primary" href="${hubLink("/signup/")}">Create your household</a>
+          <a class="cw-button" href="${hubLink("/signup/?request=1")}">Ask for a code</a>
+        </div>
+      </div>
+    </section>`;
+
+  const scripts = (options.scripts ?? [])
+    .map((src) => safeHref(src))
+    .filter((src): src is string => src !== null && src.startsWith("/"))
+    .map((src) => `<script type="module" src="${escapeHtml(src)}"></script>`)
+    .join("\n");
+  // The app's CSS can't close the style element early.
+  const appCss = (options.css ?? "").replace(/<\/style/gi, "<\\/style");
+
+  return `${documentStart({ app, hub, href, dark: options.theme === "dark", description: options.subtitle, css: HOME_CSS + appCss })}
+  <main class="home" style="--home-accent: ${app.accent}">
+    ${hero}
+    ${stories}
+    ${worksWith}
+    ${beta}
+  </main>
+  <footer class="home home-footer cw-footer cw-workspace" style="--home-accent: ${app.accent}">
+    <span>Cornerways &mdash; built for family and friends.</span>
+    <span class="home-footer-links"><a href="${hubLink("/privacy/")}">Privacy</a><a href="mailto:hello@cornerways.io">hello@cornerways.io</a><span>Est. 2026</span></span>
+  </footer>
+${scripts}
 </body>
 </html>`;
 }
