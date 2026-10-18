@@ -1,6 +1,6 @@
 {
   "name": "@cornerways/design",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "private": true,
   "description": "The shared Cornerways shell: design tokens, fonts, layout modes, header and controls, used by every *.cornerways.io site.",
   "type": "module",
@@ -17,6 +17,7 @@
     "./pwa": "./src/install/pwa.js",
     "./return-bar": "./src/returnBar.ts",
     "./agent": "./src/agent.ts",
+    "./landing": "./src/landing.ts",
     "./styles.css": "./src/styles.css",
     "./tokens.css": "./src/tokens.css",
     "./fonts.css": "./src/fonts.css",
@@ -32,10 +33,10 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "hono": "^4.8.0",
     "lucide-react": ">=1.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "hono": "^4.8.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
@@ -52,5 +53,8 @@
     "hono": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "lucide": "^1.51.0"
   }
 }

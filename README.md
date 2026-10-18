@@ -67,6 +67,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `…/flags` | `src/flags.ts` | Server-only feature flags: `resolveFlags(env, context, names)` asks the Confidence resolver Worker (binding `CONFIDENCE`) and `flags.get("flag.property", fallback)` reads the answer; any failure gives the fallback, and `FLAG_OVERRIDES` (JSON) is the instant kill switch |
 | `…/telemetry` | `src/telemetry.ts` | Server-only. Counts (never content) to the Analytics Engine dataset Mission Control reads |
 | `…/install`, `…/install.css`, `…/pwa` | `src/install/` | Installing as an app: the install card, and a Vite plugin that writes `/sw.js` with the offline page built in |
+| `…/landing` | `src/landing.ts` | Server-only. The page an app shows a signed-out visitor (below) |
 | `…/return-bar` | `src/returnBar.ts` | `initReturnBar()`: a "← Back to …" bar when another family page opened this app with `?return_to=`, checked against the family's hosts |
 | | `preview-site/` | The components in both themes plus a 390px frame: `npm run preview` |
 | | `docs/` | The [style guide](docs/style-guide.md) and its visual copy |
@@ -117,6 +118,25 @@ For an app's client, against its own worker's routes:
 - `useFamilyMembers()`: the household's members, from `GET /api/family-members`, retried twice.
 - `throwIfNotOk(res, fallback)`: throws the server's own `{ error }` message, else the fallback.
 - `hubUrl(location.hostname)`: the hub for this deployment (dev server, test or production).
+
+## The signed-out home page
+
+`@cornerways/design/landing` (server-only) draws the page an app shows a visitor who isn't signed in: the app's name and icon, a headline, a few features and a Sign in button, in the shell's own styles. The app decides when to show it (usually a signed-out page load of `/`, after any kiosk redirect) and builds the hub sign-in link:
+
+```ts
+import { renderLandingPage } from "@cornerways/design/landing";
+import { Thermometer } from "lucide";
+
+return c.html(renderLandingPage({
+  app: "home",
+  headline: "The house, from your phone",
+  intro: "Heating, lights, watering and more.",
+  features: [{ title: "Heating", text: "Every room's temperature.", icon: Thermometer }],
+  signInUrl: `${hubOrigin(c.env, c.req.url)}/login?redirect=${encodeURIComponent(c.req.url)}`,
+}));
+```
+
+The page is `noindex`; app sites aren't meant to be found by search engines. It inlines the shell's CSS through Vite's `?raw`, so the app's Worker must build with Vite (`@cloudflare/vite-plugin`), as every app's does.
 
 ## Installing as an app
 
