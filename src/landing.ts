@@ -352,7 +352,29 @@ const HOME_CSS = `
   .home-footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
   .home-footer a:hover { text-decoration: underline; }
 
+  /* A demo card for the hero's slot, and the pieces the story pictures share.
+     The app adds what's particular to its own demo. */
+  .demo { box-sizing: border-box; padding: 22px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 20px; box-shadow: var(--cw-shadow-1), var(--cw-shadow-2); }
+  .demo-pill, .v-badge { display: inline-block; padding: 4px 10px; border-radius: var(--cw-radius-pill); background: color-mix(in srgb, var(--home-accent) 14%, var(--cw-surface)); color: var(--home-accent-text); font-size: 13px; font-weight: 600; }
+  .home .demo-title { margin: 12px 0 4px; font-size: 26px; line-height: 1.2; }
+  .home .demo-intro { margin-bottom: 16px; font-size: 15px; line-height: 1.5; color: var(--cw-muted); }
+  .home .demo-result { margin-top: 16px; padding: 14px 16px; border-radius: 12px; font-size: 15px; line-height: 1.5; font-weight: 500; background: color-mix(in srgb, var(--home-accent) 14%, var(--cw-surface)); color: var(--home-accent-text); }
+  .home .demo-result[data-state="success"] { background: var(--home-accent); color: #fff; }
+  .home .demo-note { margin-top: 12px; font-size: 13px; line-height: 1.5; color: var(--cw-muted); }
+  .v-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .v-what { flex: 1; min-width: 0; font-size: 15px; }
+  .v-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .v-card { display: grid; gap: 2px; padding: 12px 14px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 12px; }
+  .v-label { font-size: 12px; font-weight: 600; color: var(--cw-muted); }
+  .v-card-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; font-size: 16px; }
+  .v-sub { font-size: 14px; color: var(--cw-muted); }
+  .v-badge { padding: 3px 9px; font-size: 12px; }
+  .v-arrow { display: flex; justify-content: center; color: var(--cw-muted); }
+  .v-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--cw-border-softer); color: var(--cw-muted); font-size: 14px; font-weight: 600; }
+
   @media (max-width: 639.98px) {
+    .demo { padding: 16px; }
+    .home .demo-title { font-size: 23px; }
     .home-hero { padding-block: 32px 44px; }
     .home-subtitle { font-size: 18px; }
     .home-section { padding-block: 48px; }
