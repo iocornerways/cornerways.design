@@ -214,6 +214,14 @@
 .strip-bar > span { width: 100%; height: var(--chance); background: color-mix(in srgb, var(--tile-accent) 75%, var(--cw-surface)); }
 .strip-hour { font-size: 11px; line-height: 1.2; color: var(--cw-muted); }
 
+/* A bar split in proportion (Trips: been against want to go), keyed to the
+   rows by their swatches: the app's colour, then a lighter shade. */
+.panel-swatch { flex: none; align-self: center; width: 10px; height: 10px; border-radius: 3px; }
+.panel-swatch[data-swatch="1"], .panel-bar > [data-swatch="1"] { background: color-mix(in srgb, var(--tile-accent) 80%, var(--cw-surface)); }
+.panel-swatch[data-swatch="2"], .panel-bar > [data-swatch="2"] { background: color-mix(in srgb, var(--tile-accent) 28%, var(--cw-surface)); }
+.panel-bar { display: flex; gap: 3px; height: 10px; margin-top: 4px; border-radius: 5px; overflow: hidden; }
+.panel-bar > span { flex-basis: 0; min-width: 4px; }
+
 /* Loading: placeholder bars sized to the panel (it keeps its size, so
    nothing shifts), then each panel fades in, a little after the one
    before. If the page's script never says it's done, the bars give way to
