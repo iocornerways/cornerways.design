@@ -129,21 +129,23 @@ function icon(app: AppDefinition, size: number): string {
 
 /**
  * The visitor's tiles: each one link to that app's own home page (its site's
- * root, which a visitor sees as the app's signed-out page). Its accessible
- * name is the app's name; its badge and description describe it.
- * `hostname` is the page's own, so links follow dev, test and production.
+ * root, which a visitor sees as the app's signed-out page). As on a member's
+ * tiles, the link is the app's name (a heading), stretched over the whole
+ * tile, so its spoken name is exactly its visible words; the badge and
+ * description describe it. `hostname` is the page's own, so links follow
+ * dev, test and production.
  */
 export function renderSignedOutTiles(hostname: string): string {
   const tiles = TILES.map((tile) => {
     const app = appOf(tile.key);
     const id = `tile-${tile.key}`;
-    return `<li><a class="app-tile" href="${escapeHtml(appUrl(app, hostname))}/" style="--tile-accent: var(--cw-accent-${tile.key})" aria-labelledby="${id}-name" aria-describedby="${tile.badge ? `${id}-badge ` : ""}${id}-text">
+    return `<li><div class="app-tile" style="--tile-accent: var(--cw-accent-${tile.key})">
       <span class="tile-head">${icon(app, 24)}${tile.badge ? `<span class="tile-badge" id="${id}-badge">${escapeHtml(tile.badge)}</span>` : ""}</span>
-      <span class="tile-name" id="${id}-name">${escapeHtml(app.name)}</span>
+      <h3 class="tile-name"><a class="tile-link" href="${escapeHtml(appUrl(app, hostname))}/" aria-describedby="${tile.badge ? `${id}-badge ` : ""}${id}-text">${escapeHtml(app.name)}</a></h3>
       <span class="tile-text" id="${id}-text">${escapeHtml(tile.description)}</span>
       <span class="tile-preview" aria-hidden="true"${typeof tile.preview === "string" ? "" : " data-panel-sample"}>${typeof tile.preview === "string" ? tile.preview : renderPanel(tile.preview)}</span>
       <span class="tile-go" aria-hidden="true">See how it works <span class="tile-arrow">→</span></span>
-    </a></li>`;
+    </div></li>`;
   });
   return `<ul class="app-tiles">\n    ${tiles.join("\n    ")}\n  </ul>\n  ${weatherSprite()}`;
 }

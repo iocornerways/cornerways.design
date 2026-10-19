@@ -97,11 +97,15 @@
 .app-tiles > li { display: flex; min-width: 0; }
 .app-tile { position: relative; box-sizing: border-box; display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 20px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 18px; box-shadow: var(--cw-shadow-1); color: var(--cw-ink); text-decoration: none; transition: transform var(--cw-ease), box-shadow var(--cw-ease), border-color var(--cw-ease); }
 .app-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgb(31 29 26 / 0.09); border-color: var(--tile-accent); color: var(--cw-ink); }
-.app-tile:focus-visible { outline: 2px solid var(--tile-accent); outline-offset: 3px; box-shadow: none; }
+/* One stretched link on the app's name, as on a member's tiles. */
+.app-tile:has(.tile-link:focus-visible) { outline: 2px solid var(--tile-accent); outline-offset: 3px; box-shadow: none; }
+.app-tile .tile-link { color: inherit; text-decoration: none; }
+.app-tile .tile-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.app-tile .tile-link:focus-visible { outline: none; }
 .app-tile .tile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .app-tile .tile-icon { width: 48px; height: 48px; border-radius: 14px; --cw-app-accent: var(--tile-accent); }
 .app-tile .tile-badge { flex: none; padding: 3px 9px; border-radius: var(--cw-radius-pill); background: var(--cw-canvas); color: color-mix(in srgb, var(--cw-ink) 82%, var(--cw-muted)); font-size: 12px; font-weight: 600; line-height: 1.3; }
-.app-tile .tile-name { margin-top: 16px; font-family: var(--cw-font-display); font-size: 22px; font-weight: 600; }
+.app-tile .tile-name { margin: 16px 0 0; font-family: var(--cw-font-display); font-size: 22px; font-weight: 600; line-height: 1.25; }
 .app-tile .tile-text { margin-top: 6px; font-size: 15px; line-height: 1.5; color: var(--cw-muted); }
 .app-tile .tile-go { margin-top: auto; padding-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
 .app-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
