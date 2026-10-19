@@ -1,6 +1,6 @@
 {
   "name": "@cornerways/design",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "private": true,
   "description": "The shared Cornerways shell: design tokens, fonts, layout modes, header and controls, used by every *.cornerways.io site.",
   "type": "module",

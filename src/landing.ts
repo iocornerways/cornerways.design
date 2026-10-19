@@ -338,6 +338,8 @@ const HOME_CSS = `
 
   .home-link-card { flex: 1 1 320px; min-width: 0; display: flex; gap: 16px; align-items: flex-start; padding: 20px; color: var(--cw-ink); background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: var(--cw-radius-card-lg); text-decoration: none; transition: border-color var(--cw-ease); }
   .home-link-card:hover { border-color: var(--cw-muted); }
+  /* A lone card would stretch the whole width; it keeps a pair's width instead. */
+  .home-link-card:only-child { max-width: 580px; }
   .home-link-card .cw-app-chip { width: 48px; height: 48px; border-radius: 14px; }
   .home-link-name { font-family: var(--cw-font-display); font-size: 20px; font-weight: 600; }
   .home-link-text { display: block; margin-top: 4px; font-size: 15px; line-height: 1.5; color: var(--cw-muted); }
