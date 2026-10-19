@@ -114,7 +114,7 @@
 /* The sample picture: same height on every tile, so their rows line up,
    and the same faint tint as a member's panel. Calendar, Weather and Food
    are sample panels (data-panel-sample), drawn exactly as a member's are. */
-.app-tile .tile-preview { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 126px; margin-top: 14px; padding: 12px 14px; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--tile-accent) 5%, var(--cw-canvas)); font-size: 13px; font-variant-numeric: tabular-nums; }
+.app-tile .tile-preview { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 134px; margin-top: 14px; padding: 12px 14px; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--tile-accent) 5%, var(--cw-canvas)); font-size: 13px; font-variant-numeric: tabular-nums; }
 .tile-rows { display: grid; gap: 6px; }
 .tile-row { display: flex; justify-content: space-between; gap: 8px; }
 .tile-row strong:last-child { font-weight: 600; }
@@ -133,9 +133,6 @@
 .tile-plat { padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--cw-accent-trains) 45%, #22201d); color: #e3eafb; font-weight: 600; white-space: nowrap; }
 .tile-note-row { display: flex; align-items: center; gap: 8px; }
 .tile-square { flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--tile-accent); }
-.tile-spark { display: grid; gap: 4px; color: var(--tile-accent); }
-.tile-spark svg { display: block; width: 100%; height: 44px; }
-.tile-spark > span { font-size: 12px; color: var(--cw-muted); }
 
 @media (prefers-reduced-motion: reduce) {
   .app-tile, .app-tile .tile-arrow { transition: none; }
@@ -171,6 +168,10 @@
 .member-tile--large .tile-glance[data-quiet] { display: none; }
 .tile-panel-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tile-panel-body[data-hero] { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; }
+/* Finance's net worth line: no scale, no figures, the app's colour. */
+.panel-spark { color: color-mix(in srgb, var(--tile-accent) 85%, var(--cw-ink)); }
+.panel-spark svg { display: block; width: 100%; height: 36px; overflow: visible; }
+.app-tile .tile-preview .panel-spark svg { height: 26px; }
 .panel-hero { font-family: var(--cw-font-display); font-size: 40px; font-weight: 600; line-height: 1; }
 .panel-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .panel-headline, .panel-rows li { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin: 0; }

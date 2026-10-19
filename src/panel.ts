@@ -17,8 +17,8 @@ export interface Panel {
   checks?: boolean;
   /** Small accent squares before the rows (Notebook's titles). */
   bullets?: boolean;
-  /** The tile's one big element: Weather's temperature, or Trains' departure board. */
-  hero?: { kind: "figure"; value: string } | Board;
+  /** The tile's one big element: Weather's temperature, Trains' departure board, or Finance's net worth line. */
+  hero?: { kind: "figure"; value: string } | Board | Spark;
   /** Weather's next six hours of rain chance, as small bars. */
   strip?: RainStrip;
   /** One bar split in proportion (Trips: been against want to go), keyed to the rows by their swatch. Decorative: the rows say the numbers. */
@@ -54,6 +54,20 @@ export interface Board {
   trains: Array<{ time: string; destination: string; platform: string; status: string; state: "on-time" | "delayed" | "cancelled" | "unknown" }>;
 }
 
+/** A line with no scale (Finance's net worth over a year): points from 0 (lowest) to 1 (highest), oldest first. Decorative: the headline says which way in words. */
+export interface Spark {
+  kind: "spark";
+  points: number[];
+}
+
+/** The line's SVG points in a 100 × 40 box, or null for anything that isn't 2–24 numbers from 0 to 1. */
+export function sparkPoints(points: unknown): string | null {
+  if (!Array.isArray(points) || points.length < 2 || points.length > 24) return null;
+  if (!points.every((point) => typeof point === "number" && Number.isFinite(point) && point >= 0 && point <= 1)) return null;
+  const step = 100 / (points.length - 1);
+  return (points as number[]).map((point, i) => `${Math.round(i * step * 10) / 10},${Math.round((36 - point * 32) * 10) / 10}`).join(" ");
+}
+
 /** Chance of rain for the next few hours ("22" and 0–100). */
 export interface RainStrip {
   hours: Array<{ hour: string; chance: number }>;
@@ -81,6 +95,10 @@ function labelled(tag: "p" | "li", className: string, part: PanelRow, before = "
  */
 export function renderPanel(panel: Panel): string {
   const hero = panel.hero?.kind === "figure" ? panel.hero : null;
+  const line = panel.hero?.kind === "spark" ? sparkPoints(panel.hero.points) : null;
+  const spark = line
+    ? `<div class="panel-spark" aria-hidden="true"><svg viewBox="0 0 100 40" preserveAspectRatio="none" focusable="false"><polyline points="${line}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline></svg></div>`
+    : "";
   const headline = panel.headline ? labelled("p", "panel-headline", panel.headline) : "";
   const listFlag = panel.checks ? " data-checks" : panel.bullets ? " data-bullets" : "";
   const rows = panel.rows.length
@@ -98,5 +116,5 @@ export function renderPanel(panel: Panel): string {
         .map((hour) => `<span><span class="strip-bar"><span style="--chance: ${Number(hour.chance)}%"></span></span><span class="strip-hour">${escapeHtml(hour.hour)}</span></span>`)
         .join("")}</div></div>`
     : "";
-  return `<div class="tile-panel-body"${hero ? " data-hero" : ""}>${hero ? `<div class="panel-hero">${escapeHtml(hero.value)}</div>` : ""}${main}${strip}</div>`;
+  return `<div class="tile-panel-body"${hero ? " data-hero" : ""}>${hero ? `<div class="panel-hero">${escapeHtml(hero.value)}</div>` : ""}${spark}${main}${strip}</div>`;
 }

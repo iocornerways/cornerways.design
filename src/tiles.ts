@@ -14,7 +14,7 @@ import { ChevronRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon,
 import { APP_ICON_NODES, escapeHtml, STROKE, svg } from "./html.ts";
 import { renderPanel, type Panel } from "./panel.ts";
 
-export { renderPanel, type Board, type Panel, type PanelRow, type RainStrip, type WeatherIcon } from "./panel.ts";
+export { renderPanel, sparkPoints, type Board, type Panel, type PanelRow, type RainStrip, type Spark, type WeatherIcon } from "./panel.ts";
 
 /** The nine apps a household uses, in the homepage's order. */
 export type TileKey = Exclude<AppKey, "admin" | "agent">;
@@ -112,8 +112,15 @@ export const TILES: readonly AppTile[] = [
   {
     key: "finance",
     description: "Every account in one place, and where the money goes.",
-    // A line with no scale and no figures: the shape of things, nothing more.
-    preview: `<span class="tile-spark"><svg viewBox="0 0 200 44" preserveAspectRatio="none"><polyline points="0,36 20,32 40,34 60,26 80,28 100,20 120,22 140,14 160,16 180,8 200,6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><span>Net worth over time</span></span>`,
+    // A line with no scale and no figures: the shape of things, nothing more. The same as a member's tile.
+    preview: {
+      hero: { kind: "spark", points: [0.1, 0.2, 0.15, 0.35, 0.3, 0.5, 0.45, 0.65, 0.6, 0.8, 0.78, 0.92, 1] },
+      headline: { label: "Net worth", value: "↑ Rising" },
+      rows: [
+        { label: "Savings", value: "→ Steady" },
+        { label: "Mortgage", value: "↓ Falling" },
+      ],
+    },
   },
 ];
 
