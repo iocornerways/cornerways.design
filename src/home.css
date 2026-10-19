@@ -173,7 +173,7 @@
    three rows (label left, truncating first; value right, never wrapping),
    and at most one hero. Panels grow to the tile, so rows line up across a
    grid row; tabular numerals keep times and temperatures steady. */
-.member-tile--large .tile-panel { box-sizing: border-box; flex: 1 0 auto; display: flex; flex-direction: column; gap: 8px; min-height: 128px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: var(--cw-canvas); font-variant-numeric: tabular-nums; }
+.member-tile--large .tile-panel { position: relative; box-sizing: border-box; flex: 1 0 auto; display: flex; flex-direction: column; gap: 8px; min-height: 128px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: color-mix(in srgb, var(--tile-accent) 5%, var(--cw-canvas)); font-variant-numeric: tabular-nums; }
 .member-tile--large .tile-glance { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 600; }
 .member-tile--large .tile-glance[data-state="fallback"] { font-size: 15px; line-height: 1.5; font-weight: 400; color: var(--cw-muted); }
 .member-tile--large .tile-glance[data-quiet] { display: none; }
@@ -185,13 +185,54 @@
 .panel-headline { font-size: 16px; line-height: 1.35; font-weight: 600; }
 .panel-rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.4; }
 .panel-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.panel-value { flex: 0 0 auto; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); }
+/* A panel's value colour and chip background, from the app's accent: mixed
+   further towards the text in dark, so both stay above 4.5:1 on every tint. */
+.member-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 16%, var(--cw-surface)); }
+:root[data-theme="dark"] .member-tile, :root.dark .member-tile, [data-cw-theme="dark"] .member-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 55%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 22%, var(--cw-surface)); }
+.panel-value { flex: 0 0 auto; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--tile-ink); }
 .panel-headline .panel-value { font-weight: 600; }
 .panel-rows li[data-muted] .panel-label, .panel-rows li[data-muted] .panel-value { color: var(--cw-muted); font-weight: 400; }
 .panel-rows li[data-alert] .panel-value { color: var(--cw-brand-text); }
 .panel-rows[data-checks] li { align-items: center; }
 .panel-rows[data-checks] .panel-value { font-weight: 500; color: var(--cw-muted); }
 .panel-rows[data-checks] li[data-alert] .panel-value { font-weight: 600; color: var(--cw-brand-text); }
+
+/* "Now" stands out: today's value as a small filled chip (words, not colour alone). */
+.panel-value.panel-chip { padding: 1px 8px; border-radius: var(--cw-radius-pill); background: var(--tile-chip); color: var(--tile-ink); font-size: 12px; font-weight: 700; line-height: 1.5; }
+.panel-rows[data-checks] .panel-value.panel-chip { font-weight: 700; color: var(--tile-ink); }
+/* Who an entry is for (Calendar), as their colours: decorative. */
+.panel-dots { flex: none; align-self: center; display: inline-flex; gap: 3px; }
+.panel-dots > span { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 1px color-mix(in srgb, var(--cw-ink) 18%, transparent); }
+/* Weather's condition icon, before its headline. */
+.panel-icon { flex: none; align-self: center; width: 20px; height: 20px; color: color-mix(in srgb, var(--tile-accent) 80%, var(--cw-ink)); }
+.cw-icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* Weather's next six hours of rain: a bar each, as tall as the chance. */
+.panel-strip-wrap { grid-column: 1 / -1; min-width: 0; }
+.panel-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.panel-strip > span { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.strip-bar { display: flex; align-items: flex-end; width: 100%; height: 22px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--tile-accent) 12%, transparent); }
+.strip-bar > span { width: 100%; height: var(--chance); background: color-mix(in srgb, var(--tile-accent) 75%, var(--cw-surface)); }
+.strip-hour { font-size: 11px; line-height: 1.2; color: var(--cw-muted); }
+
+/* Loading: placeholder bars sized to the panel (it keeps its size, so
+   nothing shifts), then each panel fades in, a little after the one
+   before. If the page's script never says it's done, the bars give way to
+   the description on their own. */
+.panel-skeleton { display: none; }
+.tile-panel[data-loading] .panel-skeleton { position: absolute; inset: 16px; display: flex; flex-direction: column; gap: 12px; animation: skeleton-give-up 0s linear 6s forwards; }
+.panel-skeleton > span { height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--cw-ink) 9%, transparent); animation: skeleton-pulse 1.4s ease-in-out infinite; }
+.panel-skeleton > span:nth-child(1) { width: 55%; }
+.panel-skeleton > span:nth-child(2) { width: 85%; }
+.panel-skeleton > span:nth-child(3) { width: 70%; }
+.tile-panel[data-loading] .tile-glance { opacity: 0; animation: skeleton-reveal 0s linear 6s forwards; }
+@keyframes skeleton-give-up { to { visibility: hidden; } }
+@keyframes skeleton-reveal { to { opacity: 1; } }
+@keyframes skeleton-pulse { 50% { opacity: 0.45; } }
+.tile-panel-body[data-enter], .tile-glance[data-enter] { animation: panel-enter 320ms ease-out both; animation-delay: var(--enter-delay, 0ms); }
+@keyframes panel-enter { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .panel-skeleton > span, .tile-panel-body[data-enter], .tile-glance[data-enter] { animation: none; }
+}
 
 /* Trains' hero: a departure board set into the tile. A dark panel (with a
    slightly lighter edge, so it still stands apart on a dark page), a header
@@ -226,6 +267,11 @@
 @media (prefers-reduced-motion: reduce) {
   .board-table td[data-changed] { animation: none; }
 }
+
+/* Room under Trains' board for "Use my location" (or a note saying where
+   the board is from), kept from the start so the tile never grows. */
+.tile-locate { position: relative; z-index: 1; display: flex; align-items: center; min-height: 44px; margin-top: 10px; }
+.tile-locate-note { margin: 0; font-size: 13px; line-height: 1.4; color: var(--cw-muted); }
 
 /* The status pill, where a tile has no quick action: short text, never a control. */
 .tile-status { flex: none; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 10px; border-radius: var(--cw-radius-pill); border: 1px solid var(--cw-border-soft); background: var(--cw-canvas); color: color-mix(in srgb, var(--cw-ink) 82%, var(--cw-muted)); font-size: 12px; font-weight: 600; line-height: 1.4; }

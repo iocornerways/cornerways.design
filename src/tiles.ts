@@ -10,8 +10,8 @@
  * invented names and values. Finance's never shows a figure.
  */
 import { APPS, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
-import { ChevronRight, Pencil, Plus } from "lucide";
-import { APP_ICON_NODES, escapeHtml, svg } from "./html.ts";
+import { ChevronRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Moon, Pencil, Plus, Sun, type IconNode } from "lucide";
+import { APP_ICON_NODES, escapeHtml, STROKE, svg } from "./html.ts";
 
 /** The nine apps a household uses, in the homepage's order. */
 export type TileKey = Exclude<AppKey, "admin" | "agent">;
@@ -26,6 +26,8 @@ export interface AppTile {
   preview: string;
   /** For members: a shortcut into the app's add screen, on its own site. */
   quickAction?: { label: string; ariaLabel: string; path: string };
+  /** For members: room under the panel for "Use my location" (Trains), drawn with the page so nothing moves when it appears. */
+  locate?: boolean;
 }
 
 const row = (left: string, right: string) => `<span class="tile-row"><span>${left}</span><strong>${right}</strong></span>`;
@@ -87,6 +89,7 @@ export const TILES: readonly AppTile[] = [
     key: "trains",
     description: "Live departures for the two stations you actually use.",
     badge: "UK rail",
+    locate: true,
     preview: `<span class="tile-board">${["18:04", "18:19"]
       .map((time) => `<span><strong>${time}</strong><span>London Waterloo</span><span class="tile-plat">Plat 3</span></span>`)
       .join("")}</span>`,
@@ -143,6 +146,35 @@ export function renderSignedOutTiles(hostname: string): string {
   return `<ul class="app-tiles">\n    ${tiles.join("\n    ")}\n  </ul>`;
 }
 
+/**
+ * Weather's condition icons (the Weather app's own names), once per page as
+ * symbols: the page shows one with <use href="#cw-wx-cloud-rain">, so a
+ * glance only ever carries the icon's name, never markup.
+ */
+const WEATHER_ICONS: Record<string, IconNode> = {
+  sun: Sun,
+  moon: Moon,
+  "cloud-sun": CloudSun,
+  "cloud-moon": CloudMoon,
+  cloud: Cloud,
+  "cloud-fog": CloudFog,
+  "cloud-drizzle": CloudDrizzle,
+  "cloud-rain": CloudRain,
+  "cloud-snow": CloudSnow,
+  "cloud-lightning": CloudLightning,
+};
+
+function weatherSprite(): string {
+  const symbols = Object.entries(WEATHER_ICONS).map(([name, node]) => {
+    const shapes = node.map(([tag, attrs]) => `<${tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${escapeHtml(String(v))}"`).join(" ")}/>`).join("");
+    return `<symbol id="cw-wx-${name}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round">${shapes}</symbol>`;
+  });
+  return `<svg class="cw-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false">${symbols.join("")}</svg>`;
+}
+
+/** Placeholder bars while a panel's glance is on its way: sized to a real panel, hidden from assistive tech. */
+const SKELETON = `<span class="panel-skeleton" aria-hidden="true"><span></span><span></span><span></span></span>`;
+
 /** The tiles a member sees: pinned (large, with any quick action) then the rest. */
 export interface MemberTilesOptions {
   hostname: string;
@@ -169,6 +201,10 @@ function tileOf(key: TileKey): AppTile {
  * take it for theirs. The chevron is a quiet "this opens", for sight only:
  * the link's name is the app's.
  *
+ * While the glances load, each large panel shows placeholder bars (sized to
+ * the panel, so nothing shifts); if the page's script never says it's done,
+ * the styles give way to the description on their own after a few seconds.
+ *
  * With nothing left in More, the pinned tiles are simply "Your apps".
  */
 export function renderMemberTiles(options: MemberTilesOptions): string {
@@ -182,10 +218,11 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
     return `<li class="member-tile member-tile--large" style="--tile-accent: var(--cw-accent-${key})">
         <span class="tile-head">${icon(app, 24)}${corner}</span>
         <h3 class="tile-name"><a class="tile-link" href="${escapeHtml(base)}/" aria-describedby="glance-${key}">${escapeHtml(app.name)}</a></h3>
-        <div class="tile-panel" data-panel="${key}">
+        <div class="tile-panel" data-panel="${key}" data-loading>
+          ${SKELETON}
           <p class="tile-glance" id="glance-${key}" data-glance="${key}" data-state="fallback">${escapeHtml(tile.description)}</p>
           <div class="tile-panel-body" data-panel-body="${key}" hidden></div>
-        </div>
+        </div>${tile.locate ? `\n        <div class="tile-locate" data-locate="${key}"></div>` : ""}
         <span class="tile-chevron" aria-hidden="true">${svg(ChevronRight, 20)}</span>
       </li>`;
   };
@@ -220,6 +257,7 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
     : "";
   return `<div class="member-tiles-area" data-tiles-area>
   ${[pinned, more].filter(Boolean).join("\n  ")}
+  ${weatherSprite()}
   </div>`;
 }
 
