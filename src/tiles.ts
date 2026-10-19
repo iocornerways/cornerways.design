@@ -116,10 +116,7 @@ export const TILES: readonly AppTile[] = [
     preview: {
       hero: { kind: "spark", points: [0.1, 0.2, 0.15, 0.35, 0.3, 0.5, 0.45, 0.65, 0.6, 0.8, 0.78, 0.92, 1] },
       headline: { label: "Net worth", value: "↑ Rising" },
-      rows: [
-        { label: "Savings", value: "→ Steady" },
-        { label: "Mortgage", value: "↓ Falling" },
-      ],
+      rows: [],
     },
   },
 ];

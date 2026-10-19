@@ -170,8 +170,8 @@
 .tile-panel-body[data-hero] { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; }
 /* Finance's net worth line: no scale, no figures, the app's colour. */
 .panel-spark { color: color-mix(in srgb, var(--tile-accent) 85%, var(--cw-ink)); }
-.panel-spark svg { display: block; width: 100%; height: 36px; overflow: visible; }
-.app-tile .tile-preview .panel-spark svg { height: 26px; }
+.panel-spark svg { display: block; width: 100%; height: 60px; overflow: visible; }
+.app-tile .tile-preview .panel-spark svg { height: 44px; }
 .panel-hero { font-family: var(--cw-font-display); font-size: 40px; font-weight: 600; line-height: 1; }
 .panel-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .panel-headline, .panel-rows li { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin: 0; }
