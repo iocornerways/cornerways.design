@@ -191,3 +191,26 @@
   .member-tile, .member-tile .tile-arrow { transition: none; }
   .member-tile:hover, .member-tile:hover .tile-arrow { transform: none; }
 }
+
+/* "Edit tiles": the button, an empty Pinned, and the editor that replaces the tiles. */
+.tile-edit-button { height: auto; min-height: 44px; padding: 0 16px; font-size: 15px; font-weight: 600; }
+.member-empty { margin: 0; padding: 20px; border: 1px dashed var(--cw-border); border-radius: 16px; color: var(--cw-muted); }
+.tile-editor { margin-top: 32px; max-width: 640px; }
+.tile-editor h2 { font-size: 24px; margin: 0 0 6px; }
+.tile-editor h2:focus { outline: none; }
+.tile-editor h3 { margin: 24px 0 10px; font-family: var(--cw-font-ui); font-size: 15px; font-weight: 700; color: var(--cw-muted); text-transform: none; }
+.tile-editor-intro { color: var(--cw-muted); margin: 0; }
+.editor-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.editor-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 10px 12px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 14px; }
+.editor-row[draggable="true"] { cursor: grab; }
+.editor-row.is-dragging { opacity: 0.5; }
+.editor-row.is-drop-target { border-color: var(--tile-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--tile-accent) 30%, transparent); }
+.editor-row .tile-icon { width: 40px; height: 40px; border-radius: 12px; --cw-app-accent: var(--tile-accent); }
+.editor-name { flex: 1 1 120px; min-width: 0; font-weight: 600; }
+.editor-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.editor-buttons .cw-button { height: auto; min-height: 44px; min-width: 44px; padding: 0 12px; font-size: 14px; }
+.editor-buttons .cw-button svg { width: 18px; height: 18px; }
+.editor-empty { margin: 0; color: var(--cw-muted); }
+.editor-status { min-height: 1.5em; margin: 16px 0 0; color: var(--cw-muted); }
+.editor-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.editor-actions .cw-button { height: auto; min-height: 48px; padding: 0 22px; font-size: 16px; font-weight: 600; }

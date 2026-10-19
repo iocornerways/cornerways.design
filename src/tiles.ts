@@ -10,7 +10,7 @@
  * invented names and values. Finance's never shows a figure.
  */
 import { APPS, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
-import { ChevronRight, Plus } from "lucide";
+import { ChevronRight, Pencil, Plus } from "lucide";
 import { APP_ICON_NODES, escapeHtml, svg } from "./html.ts";
 
 /** The nine apps a household uses, in the homepage's order. */
@@ -189,14 +189,17 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
         <span class="tile-chevron" aria-hidden="true">${svg(ChevronRight, 20)}</span>
       </li>`;
   };
-  const pinned = options.pinned.length
-    ? `<section class="member-section" aria-labelledby="pinned-title">
-    <div class="member-section-head"><h2 id="pinned-title">Pinned</h2></div>
-    <ul class="member-tiles member-tiles--large">
+  // "Edit tiles" needs the page's script (tile-editor.js), which shows it.
+  const pinned = `<section class="member-section" aria-labelledby="pinned-title">
+    <div class="member-section-head"><h2 id="pinned-title">Pinned</h2><button type="button" class="cw-button tile-edit-button" data-edit-tiles hidden>${svg(Pencil, 18)}Edit tiles</button></div>
+    ${
+      options.pinned.length
+        ? `<ul class="member-tiles member-tiles--large">
       ${options.pinned.map(large).join("\n      ")}
-    </ul>
-  </section>`
-    : "";
+    </ul>`
+        : `<p class="member-empty">Nothing pinned yet. Pin the apps you use most and they’ll show here first.</p>`
+    }
+  </section>`;
   const more = options.more.length
     ? `<section class="member-section" aria-labelledby="more-title">
     <h2 id="more-title">More</h2>
@@ -205,5 +208,30 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
     </ul>
   </section>`
     : "";
-  return [pinned, more].filter(Boolean).join("\n  ");
+  return `<div class="member-tiles-area" data-tiles-area>
+  ${[pinned, more].filter(Boolean).join("\n  ")}
+  </div>`;
+}
+
+/**
+ * The editor "Edit tiles" opens in place of the tiles: the pinned apps in
+ * order, then the rest. Rows only; tile-editor.js (on the page) adds each
+ * row's buttons (Move earlier, Move later, Unpin / Pin), dragging, and saving.
+ */
+export function renderTileEditor(options: { pinned: readonly TileKey[]; more: readonly TileKey[] }): string {
+  const row = (key: TileKey) => {
+    const app = appOf(key);
+    return `<li class="editor-row" data-app="${key}" data-order="${TILES.findIndex((tile) => tile.key === key)}" style="--tile-accent: var(--cw-accent-${key})">${icon(app, 20)}<span class="editor-name">${escapeHtml(app.name)}</span><span class="editor-buttons"></span></li>`;
+  };
+  return `<section class="tile-editor" data-tile-editor hidden aria-labelledby="tile-editor-title">
+    <h2 id="tile-editor-title" tabindex="-1">Edit tiles</h2>
+    <p class="tile-editor-intro">Pin the apps you use most: they show first, with their quick action. Move them into the order you like, with the buttons or by dragging.</p>
+    <h3 id="editor-pinned-title">Pinned</h3>
+    <ol class="editor-list" data-list="pinned" aria-labelledby="editor-pinned-title">${options.pinned.map(row).join("")}</ol>
+    <p class="editor-empty" data-empty-pinned${options.pinned.length ? " hidden" : ""}>Nothing pinned.</p>
+    <h3 id="editor-more-title">Other apps</h3>
+    <ul class="editor-list" data-list="more" aria-labelledby="editor-more-title">${options.more.map(row).join("")}</ul>
+    <p class="editor-status" data-editor-status aria-live="polite"></p>
+    <div class="editor-actions"><button type="button" class="cw-button cw-button--primary" data-editor-done>Done</button><button type="button" class="cw-button" data-editor-cancel>Cancel</button></div>
+  </section>`;
 }
