@@ -89,3 +89,63 @@
     /* The shell hides its footer on phones; here it holds Privacy and the contact address. */
     .home-footer.cw-footer { display: flex; }
   }
+
+/* ---------- App tiles (tiles.ts) ----------
+   A visitor's tile: the whole tile is one link to the app's own home page.
+   --tile-accent is the app's accent (--cw-accent-<key>). */
+.app-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; margin: 0; padding: 0; list-style: none; }
+.app-tiles > li { display: flex; min-width: 0; }
+.app-tile { position: relative; box-sizing: border-box; display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 20px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 18px; box-shadow: var(--cw-shadow-1); color: var(--cw-ink); text-decoration: none; transition: transform var(--cw-ease), box-shadow var(--cw-ease), border-color var(--cw-ease); }
+.app-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgb(31 29 26 / 0.09); border-color: var(--tile-accent); color: var(--cw-ink); }
+.app-tile:focus-visible { outline: 2px solid var(--tile-accent); outline-offset: 3px; box-shadow: none; }
+.app-tile .tile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.app-tile .tile-icon { width: 48px; height: 48px; border-radius: 14px; --cw-app-accent: var(--tile-accent); }
+.app-tile .tile-badge { flex: none; padding: 3px 9px; border-radius: var(--cw-radius-pill); background: var(--cw-canvas); color: color-mix(in srgb, var(--cw-ink) 82%, var(--cw-muted)); font-size: 12px; font-weight: 600; line-height: 1.3; }
+.app-tile .tile-name { margin-top: 16px; font-family: var(--cw-font-display); font-size: 22px; font-weight: 600; }
+.app-tile .tile-text { margin-top: 6px; font-size: 15px; line-height: 1.5; color: var(--cw-muted); }
+.app-tile .tile-go { margin-top: auto; padding-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
+.app-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
+.app-tile:hover .tile-arrow { transform: translateX(4px); }
+
+/* The sample picture: same height on every tile, so their rows line up. */
+.app-tile .tile-preview { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 92px; margin-top: 14px; padding: 10px 12px; overflow: hidden; border-radius: 12px; background: var(--cw-canvas); font-size: 13px; }
+.tile-rows { display: grid; gap: 6px; }
+.tile-row { display: flex; justify-content: space-between; gap: 8px; }
+.tile-row strong:last-child { font-weight: 600; }
+.tile-week { display: flex; gap: 4px; }
+.tile-week > span { flex: 1; display: grid; justify-items: center; line-height: 1.3; }
+.tile-week-d { font-size: 11px; color: var(--cw-muted); }
+.tile-week strong { font-size: 15px; }
+.tile-week-dots { display: flex; gap: 3px; height: 8px; align-items: center; }
+.tile-week-dots span { width: 6px; height: 6px; border-radius: 50%; }
+.tile-check { display: flex; align-items: center; gap: 8px; }
+.tile-check[data-done] span:last-child { text-decoration: line-through; color: var(--cw-muted); }
+.tile-box { box-sizing: border-box; flex: none; width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid color-mix(in srgb, var(--cw-muted) 75%, transparent); }
+.tile-box[data-done] { border-color: var(--tile-accent); background: var(--tile-accent); }
+.tile-weather { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tile-weather > strong { font-family: var(--cw-font-display); font-size: 34px; font-weight: 600; }
+.tile-weather > span { display: grid; text-align: end; line-height: 1.5; }
+.tile-weather > span > span { color: var(--cw-muted); }
+.tile-rank { display: flex; gap: 10px; }
+.tile-rank strong { width: 12px; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
+.tile-rank:first-child span { font-weight: 600; }
+.app-tile .tile-preview:has(.tile-board) { background: #22201d; color: #f5f3ef; }
+.tile-board { display: grid; gap: 8px; }
+.tile-board > span { display: flex; align-items: center; gap: 10px; }
+.tile-board strong { font-size: 15px; }
+.tile-board > span > span:nth-child(2) { flex: 1; min-width: 0; }
+.tile-plat { padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--cw-accent-trains) 45%, #22201d); color: #e3eafb; font-weight: 600; white-space: nowrap; }
+.tile-meal { display: grid; gap: 5px; justify-items: start; }
+.tile-meal strong { font-size: 15px; }
+.tile-meal > span:last-child { color: var(--cw-muted); }
+.tile-pill { padding: 2px 8px; border-radius: var(--cw-radius-pill); background: color-mix(in srgb, var(--tile-accent) 14%, var(--cw-surface)); color: color-mix(in srgb, var(--tile-accent) 80%, var(--cw-ink)); font-size: 12px; font-weight: 600; }
+.tile-note-row { display: flex; align-items: center; gap: 8px; }
+.tile-square { flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--tile-accent); }
+.tile-spark { display: grid; gap: 4px; color: var(--tile-accent); }
+.tile-spark svg { display: block; width: 100%; height: 44px; }
+.tile-spark > span { font-size: 12px; color: var(--cw-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-tile, .app-tile .tile-arrow { transition: none; }
+  .app-tile:hover, .app-tile:hover .tile-arrow { transform: none; }
+}

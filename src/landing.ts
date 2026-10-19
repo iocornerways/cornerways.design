@@ -11,20 +11,7 @@
  * Not for search engines: app sites are noindex, and the hub's own pages are
  * the ones meant to be found.
  */
-import {
-  Bot,
-  CalendarDays,
-  CloudSun,
-  Compass,
-  Gauge,
-  House,
-  ListChecks,
-  NotebookPen,
-  PiggyBank,
-  TrainFront,
-  UtensilsCrossed,
-  type IconNode,
-} from "lucide";
+import { APP_ICON_NODES, escapeHtml, svg, type IconNode } from "./html.ts";
 import { APPS, PRIVATE_LAN_HOSTNAME, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
 import { GOOGLE_FONTS_HREF } from "./fonts.ts";
 import tokensCss from "./tokens.css?raw";
@@ -35,23 +22,7 @@ import homeCss from "./home.css?raw";
 
 export type { IconNode } from "lucide";
 
-/** Each app's line icon, as icons.tsx has it for React (keep the two in step). */
-const APP_ICON_NODES: Record<AppKey, IconNode> = {
-  home: House,
-  calendar: CalendarDays,
-  todo: ListChecks,
-  weather: CloudSun,
-  trips: Compass,
-  trains: TrainFront,
-  food: UtensilsCrossed,
-  notes: NotebookPen,
-  finance: PiggyBank,
-  admin: Gauge,
-  agent: Bot,
-};
 
-/** Stroke width for every icon, as ICON_STROKE (icons.tsx) has it. */
-const STROKE = 1.7;
 
 export interface LandingFeature {
   title: string;
@@ -86,21 +57,6 @@ export interface LandingPageOptions {
   footer?: { note?: string; links?: LandingLink[] };
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function svg(node: IconNode, size: number): string {
-  const shapes = node
-    .map(([tag, attrs]) => `<${tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${escapeHtml(String(v))}"`).join(" ")}/>`)
-    .join("");
-  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${shapes}</svg>`;
-}
 
 const MARK =
   '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 15V11C9.5 9.6193 10.6193 8.5 12 8.5H15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
