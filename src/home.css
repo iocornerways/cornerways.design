@@ -173,6 +173,28 @@
 .member-tile--large .tile-glance[data-state="fallback"] { font-size: 15px; line-height: 1.5; font-weight: 400; color: var(--cw-muted); }
 .member-tile--large .tile-glance-sub { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--cw-muted); }
 .member-tile--large .tile-glance-sub:empty { display: none; }
+/* A large tile's panel: its glance line, then a few of the household's own
+   rows (filled in by the page), in the signed-out tiles' sample style. Its
+   height is held from the start, so the tile doesn't jump as it fills. */
+.member-tile--large .tile-panel { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 8px; min-height: 124px; margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--cw-canvas); }
+.member-tile--large .tile-panel .tile-glance { margin: 0; font-size: 16px; line-height: 1.35; }
+.member-tile--large .tile-panel .tile-glance[data-state="fallback"] { font-size: 15px; }
+.member-tile--large .tile-panel .tile-glance[data-quiet] { display: none; }
+.member-tile--large .tile-panel .tile-glance-sub { margin: -4px 0 0; }
+.member-tile--large .tile-panel:has(.tile-panel-rows:not([hidden])) .tile-glance-sub { display: none; }
+.tile-panel-rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.4; }
+.tile-panel-rows li { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.tile-panel-rows .tile-row-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile-panel-rows .tile-row-meta { flex: none; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); }
+.tile-panel-rows[data-panel="checks"] li { align-items: center; }
+.tile-panel-rows[data-panel="checks"] .tile-row-meta { font-weight: 500; color: var(--cw-muted); }
+.tile-panel-rows[data-panel="checks"] .tile-row-meta[data-overdue] { font-weight: 600; color: var(--cw-brand-text); }
+.member-tile--large .tile-panel:has([data-panel="figure"]:not([hidden])) { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; }
+.tile-panel-figure { grid-column: 1; grid-row: 1; font-family: var(--cw-font-display); font-size: 40px; font-weight: 600; line-height: 1; }
+.member-tile--large .tile-panel:has([data-panel="figure"]:not([hidden])) .tile-glance { display: none; }
+.tile-panel-rows[data-panel="figure"] { grid-column: 2; grid-row: 1; }
+.tile-panel-rows[data-panel="figure"] li:first-child { font-weight: 600; font-size: 16px; }
+.tile-panel-rows[data-panel="figure"] li + li { color: var(--cw-muted); }
 .member-tile--large .tile-go { margin-top: auto; padding-top: 18px; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
 .member-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
 .member-tile:hover .tile-arrow { transform: translateX(4px); }

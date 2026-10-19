@@ -157,11 +157,15 @@ function tileOf(key: TileKey): AppTile {
 }
 
 /**
- * Each tile is one stretched link on the app's name (its glance lines are
- * its description), with the quick action a separate link beside it, never
- * inside it. The glance lines start as the app's description and are filled
- * in later (data-glance / data-glance-sub); when nothing arrives the
- * description simply stays.
+ * Each tile is one stretched link on the app's name (its glance line is its
+ * description), with the quick action a separate link beside it, never
+ * inside it. A large tile's panel holds the glance: it starts as the app's
+ * description and the page fills it in later (data-glance, then a few of the
+ * household's own rows in data-glance-rows); when nothing arrives the
+ * description simply stays. Never sample data: a member would take it for
+ * theirs.
+ *
+ * With nothing left in More, the pinned tiles are simply "Your apps".
  */
 export function renderMemberTiles(options: MemberTilesOptions): string {
   const large = (key: TileKey) => {
@@ -174,8 +178,11 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
     return `<li class="member-tile member-tile--large" style="--tile-accent: var(--cw-accent-${key})">
         <span class="tile-head">${icon(app, 24)}${action}</span>
         <h3 class="tile-name"><a class="tile-link" href="${escapeHtml(base)}/" aria-describedby="glance-${key} glance-${key}-sub">${escapeHtml(app.name)}</a></h3>
-        <p class="tile-glance" id="glance-${key}" data-glance="${key}" data-state="fallback">${escapeHtml(tile.description)}</p>
-        <p class="tile-glance-sub" id="glance-${key}-sub" data-glance-sub="${key}"></p>
+        <div class="tile-panel" data-panel="${key}">
+          <p class="tile-glance" id="glance-${key}" data-glance="${key}" data-state="fallback">${escapeHtml(tile.description)}</p>
+          <p class="tile-glance-sub" id="glance-${key}-sub" data-glance-sub="${key}"></p>
+          <ul class="tile-panel-rows" data-glance-rows="${key}" hidden></ul>
+        </div>
         <span class="tile-go" aria-hidden="true">Open <span class="tile-arrow">→</span></span>
       </li>`;
   };
@@ -191,7 +198,7 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
   };
   // "Edit tiles" needs the page's script (tile-editor.js), which shows it.
   const pinned = `<section class="member-section" aria-labelledby="pinned-title">
-    <div class="member-section-head"><h2 id="pinned-title">Pinned</h2><button type="button" class="cw-button tile-edit-button" data-edit-tiles hidden>${svg(Pencil, 18)}Edit tiles</button></div>
+    <div class="member-section-head"><h2 id="pinned-title">${options.more.length ? "Pinned" : "Your apps"}</h2><button type="button" class="cw-button tile-edit-button" data-edit-tiles hidden>${svg(Pencil, 18)}Edit tiles</button></div>
     ${
       options.pinned.length
         ? `<ul class="member-tiles member-tiles--large">
