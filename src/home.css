@@ -107,25 +107,17 @@
 .app-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
 .app-tile:hover .tile-arrow { transform: translateX(4px); }
 
-/* The sample picture: same height on every tile, so their rows line up. */
-.app-tile .tile-preview { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 92px; margin-top: 14px; padding: 10px 12px; overflow: hidden; border-radius: 12px; background: var(--cw-canvas); font-size: 13px; }
+/* The sample picture: same height on every tile, so their rows line up,
+   and the same faint tint as a member's panel. Calendar, Weather and Food
+   are sample panels (data-panel-sample), drawn exactly as a member's are. */
+.app-tile .tile-preview { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; height: 126px; margin-top: 14px; padding: 12px 14px; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--tile-accent) 5%, var(--cw-canvas)); font-size: 13px; font-variant-numeric: tabular-nums; }
 .tile-rows { display: grid; gap: 6px; }
 .tile-row { display: flex; justify-content: space-between; gap: 8px; }
 .tile-row strong:last-child { font-weight: 600; }
-.tile-week { display: flex; gap: 4px; }
-.tile-week > span { flex: 1; display: grid; justify-items: center; line-height: 1.3; }
-.tile-week-d { font-size: 11px; color: var(--cw-muted); }
-.tile-week strong { font-size: 15px; }
-.tile-week-dots { display: flex; gap: 3px; height: 8px; align-items: center; }
-.tile-week-dots span { width: 6px; height: 6px; border-radius: 50%; }
 .tile-check { display: flex; align-items: center; gap: 8px; }
 .tile-check[data-done] span:last-child { text-decoration: line-through; color: var(--cw-muted); }
 .tile-box { box-sizing: border-box; flex: none; width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid color-mix(in srgb, var(--cw-muted) 75%, transparent); }
 .tile-box[data-done] { border-color: var(--tile-accent); background: var(--tile-accent); }
-.tile-weather { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.tile-weather > strong { font-family: var(--cw-font-display); font-size: 34px; font-weight: 600; }
-.tile-weather > span { display: grid; text-align: end; line-height: 1.5; }
-.tile-weather > span > span { color: var(--cw-muted); }
 .tile-rank { display: flex; gap: 10px; }
 .tile-rank strong { width: 12px; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
 .tile-rank:first-child span { font-weight: 600; }
@@ -135,10 +127,6 @@
 .tile-board strong { font-size: 15px; }
 .tile-board > span > span:nth-child(2) { flex: 1; min-width: 0; }
 .tile-plat { padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--cw-accent-trains) 45%, #22201d); color: #e3eafb; font-weight: 600; white-space: nowrap; }
-.tile-meal { display: grid; gap: 5px; justify-items: start; }
-.tile-meal strong { font-size: 15px; }
-.tile-meal > span:last-child { color: var(--cw-muted); }
-.tile-pill { padding: 2px 8px; border-radius: var(--cw-radius-pill); background: color-mix(in srgb, var(--tile-accent) 14%, var(--cw-surface)); color: color-mix(in srgb, var(--tile-accent) 80%, var(--cw-ink)); font-size: 12px; font-weight: 600; }
 .tile-note-row { display: flex; align-items: center; gap: 8px; }
 .tile-square { flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--tile-accent); }
 .tile-spark { display: grid; gap: 4px; color: var(--tile-accent); }
@@ -187,13 +175,16 @@
 .panel-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* A panel's value colour and chip background, from the app's accent: mixed
    further towards the text in dark, so both stay above 4.5:1 on every tint. */
-.member-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 16%, var(--cw-surface)); }
-:root[data-theme="dark"] .member-tile, :root.dark .member-tile, [data-cw-theme="dark"] .member-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 55%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 22%, var(--cw-surface)); }
+.member-tile, .app-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 16%, var(--cw-surface)); }
+:root[data-theme="dark"] .member-tile, :root.dark .member-tile, [data-cw-theme="dark"] .member-tile, :root[data-theme="dark"] .app-tile, :root.dark .app-tile, [data-cw-theme="dark"] .app-tile { --tile-ink: color-mix(in srgb, var(--tile-accent) 55%, var(--cw-ink)); --tile-chip: color-mix(in srgb, var(--tile-accent) 22%, var(--cw-surface)); }
 .panel-value { flex: 0 0 auto; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--tile-ink); }
 .panel-headline .panel-value { font-weight: 600; }
 .panel-rows li[data-muted] .panel-label, .panel-rows li[data-muted] .panel-value { color: var(--cw-muted); font-weight: 400; }
 .panel-rows li[data-alert] .panel-value { color: var(--cw-brand-text); }
 .panel-rows[data-checks] li { align-items: center; }
+/* Notebook's titles, each after a small accent square. */
+.panel-rows[data-bullets] li { align-items: center; }
+.panel-rows[data-bullets] li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--tile-accent); }
 .panel-rows[data-checks] .panel-value { font-weight: 500; color: var(--cw-muted); }
 .panel-rows[data-checks] li[data-alert] .panel-value { font-weight: 600; color: var(--cw-brand-text); }
 

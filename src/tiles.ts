@@ -12,6 +12,9 @@
 import { APPS, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
 import { ChevronRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, MapPin, Moon, Pencil, Plus, Sun, type IconNode } from "lucide";
 import { APP_ICON_NODES, escapeHtml, STROKE, svg } from "./html.ts";
+import { renderPanel, type Panel } from "./panel.ts";
+
+export { renderPanel, type Board, type Panel, type PanelRow, type RainStrip, type WeatherIcon } from "./panel.ts";
 
 /** The nine apps a household uses, in the homepage's order. */
 export type TileKey = Exclude<AppKey, "admin" | "agent">;
@@ -22,8 +25,8 @@ export interface AppTile {
   description: string;
   /** A fact a visitor should know first. */
   badge?: string;
-  /** A tiny sample of the app, as HTML (aria-hidden by the renderer). */
-  preview: string;
+  /** A tiny sample of the app, as HTML (aria-hidden by the renderer); or, for apps whose member tile has the same shape, a sample panel drawn exactly as the member's real one is. */
+  preview: string | Panel;
   /** For members: a shortcut into the app's add screen, on its own site. */
   quickAction?: { label: string; ariaLabel: string; path: string };
 }
@@ -41,22 +44,13 @@ export const TILES: readonly AppTile[] = [
   {
     key: "calendar",
     description: "Birthdays, plans and days off, shared by everyone at home.",
-    preview: `<span class="tile-week">${[
-      ["M", "19", []],
-      ["T", "20", ["calendar"]],
-      ["W", "21", []],
-      ["T", "22", ["weather"]],
-      ["F", "23", []],
-      ["S", "24", ["trips", "calendar"]],
-      ["S", "25", []],
-    ]
-      .map(
-        ([d, n, dots]) =>
-          `<span><span class="tile-week-d">${d}</span><strong>${n}</strong><span class="tile-week-dots">${(dots as string[])
-            .map((a) => `<span style="background: var(--cw-accent-${a})"></span>`)
-            .join("")}</span></span>`,
-      )
-      .join("")}</span>`,
+    preview: {
+      rows: [
+        { label: "Maxine’s 60th", value: "today", today: true },
+        { label: "Swim club", value: "Wednesday", dots: ["#C32C9B", "#513EE0"] },
+        { label: "Parents’ evening", value: "Thursday", dots: ["#513EE0"] },
+      ],
+    },
     quickAction: { label: "Entry", ariaLabel: "Add a calendar entry", path: "/?new=1" },
   },
   {
@@ -74,7 +68,12 @@ export const TILES: readonly AppTile[] = [
   {
     key: "weather",
     description: "What it’s like now and the days ahead, for where you live.",
-    preview: `<span class="tile-weather"><strong>12°</strong><span><strong>Rain in 75 min</strong><span>Dry tomorrow</span></span></span>`,
+    preview: {
+      hero: { kind: "figure", value: "12°" },
+      headline: { label: "Light rain", icon: "cloud-rain" },
+      rows: [{ label: "Tomorrow", value: "Dry, 14°" }],
+      strip: { hours: [["14", 70], ["15", 55], ["16", 30], ["17", 10], ["18", 5], ["19", 0]].map(([hour, chance]) => ({ hour: hour as string, chance: chance as number })) },
+    },
   },
   {
     key: "trips",
@@ -94,7 +93,13 @@ export const TILES: readonly AppTile[] = [
   {
     key: "food",
     description: "Meals, recipes and what’s in the fridge, all in one place.",
-    preview: `<span class="tile-meal"><span class="tile-pill">Tonight</span><strong>Chicken traybake</strong><span>Tomorrow: lasagne</span></span>`,
+    preview: {
+      rows: [
+        { label: "Chicken traybake", value: "Tonight", today: true },
+        { label: "Lasagne", value: "Tomorrow" },
+        { label: "Nothing planned", value: "Wednesday", muted: true },
+      ],
+    },
     quickAction: { label: "Meal", ariaLabel: "Plan a meal", path: "/?add=1" },
   },
   {
@@ -136,11 +141,11 @@ export function renderSignedOutTiles(hostname: string): string {
       <span class="tile-head">${icon(app, 24)}${tile.badge ? `<span class="tile-badge" id="${id}-badge">${escapeHtml(tile.badge)}</span>` : ""}</span>
       <span class="tile-name" id="${id}-name">${escapeHtml(app.name)}</span>
       <span class="tile-text" id="${id}-text">${escapeHtml(tile.description)}</span>
-      <span class="tile-preview" aria-hidden="true">${tile.preview}</span>
+      <span class="tile-preview" aria-hidden="true"${typeof tile.preview === "string" ? "" : " data-panel-sample"}>${typeof tile.preview === "string" ? tile.preview : renderPanel(tile.preview)}</span>
       <span class="tile-go" aria-hidden="true">See how it works <span class="tile-arrow">→</span></span>
     </a></li>`;
   });
-  return `<ul class="app-tiles">\n    ${tiles.join("\n    ")}\n  </ul>`;
+  return `<ul class="app-tiles">\n    ${tiles.join("\n    ")}\n  </ul>\n  ${weatherSprite()}`;
 }
 
 /**
