@@ -10,7 +10,7 @@
  * invented names and values. Finance's never shows a figure.
  */
 import { APPS, appUrl, type AppDefinition, type AppKey } from "./apps.ts";
-import { ChevronRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Moon, Pencil, Plus, Sun, type IconNode } from "lucide";
+import { ChevronRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, MapPin, Moon, Pencil, Plus, Sun, type IconNode } from "lucide";
 import { APP_ICON_NODES, escapeHtml, STROKE, svg } from "./html.ts";
 
 /** The nine apps a household uses, in the homepage's order. */
@@ -26,8 +26,6 @@ export interface AppTile {
   preview: string;
   /** For members: a shortcut into the app's add screen, on its own site. */
   quickAction?: { label: string; ariaLabel: string; path: string };
-  /** For members: room under the panel for "Use my location" (Trains), drawn with the page so nothing moves when it appears. */
-  locate?: boolean;
 }
 
 const row = (left: string, right: string) => `<span class="tile-row"><span>${left}</span><strong>${right}</strong></span>`;
@@ -89,7 +87,6 @@ export const TILES: readonly AppTile[] = [
     key: "trains",
     description: "Live departures for the two stations you actually use.",
     badge: "UK rail",
-    locate: true,
     preview: `<span class="tile-board">${["18:04", "18:19"]
       .map((time) => `<span><strong>${time}</strong><span>London Waterloo</span><span class="tile-plat">Plat 3</span></span>`)
       .join("")}</span>`,
@@ -149,7 +146,8 @@ export function renderSignedOutTiles(hostname: string): string {
 /**
  * Weather's condition icons (the Weather app's own names), once per page as
  * symbols: the page shows one with <use href="#cw-wx-cloud-rain">, so a
- * glance only ever carries the icon's name, never markup.
+ * glance only ever carries the icon's name, never markup. "locate" is the
+ * pin on Trains' "Use location" button.
  */
 const WEATHER_ICONS: Record<string, IconNode> = {
   sun: Sun,
@@ -162,6 +160,7 @@ const WEATHER_ICONS: Record<string, IconNode> = {
   "cloud-rain": CloudRain,
   "cloud-snow": CloudSnow,
   "cloud-lightning": CloudLightning,
+  locate: MapPin,
 };
 
 function weatherSprite(): string {
@@ -222,7 +221,7 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
           ${SKELETON}
           <p class="tile-glance" id="glance-${key}" data-glance="${key}" data-state="fallback">${escapeHtml(tile.description)}</p>
           <div class="tile-panel-body" data-panel-body="${key}" hidden></div>
-        </div>${tile.locate ? `\n        <div class="tile-locate" data-locate="${key}"></div>` : ""}
+        </div>
         <span class="tile-chevron" aria-hidden="true">${svg(ChevronRight, 20)}</span>
       </li>`;
   };
