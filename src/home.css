@@ -193,6 +193,40 @@
 .panel-rows[data-checks] .panel-value { font-weight: 500; color: var(--cw-muted); }
 .panel-rows[data-checks] li[data-alert] .panel-value { font-weight: 600; color: var(--cw-brand-text); }
 
+/* Trains' hero: a departure board set into the tile. A dark panel (with a
+   slightly lighter edge, so it still stands apart on a dark page), a header
+   saying which way, then the next two trains: time, destination, platform,
+   status (headings for screen readers only).
+   Status is always words; amber for expected times and delays, a struck-out
+   time for a cancelled train. The soonest train is larger. A clean sans with
+   tabular numerals, no dot matrix. On a phone each train stays on one line:
+   the destination gives way first. */
+.member-tile--large .tile-panel:has(.panel-board) { --board-bg: #22201d; padding: 12px 14px; background: var(--board-bg); border: 1px solid color-mix(in srgb, #f5f3ef 12%, var(--board-bg)); color: #f5f3ef; }
+.panel-board { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #cbc4ba; }
+.board-head > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-updated { flex: none; font-weight: 500; letter-spacing: 0.02em; text-transform: none; }
+.board-table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.board-table td { padding: 3px 0; white-space: nowrap; vertical-align: baseline; }
+.board-table td + td { padding-left: 8px; }
+.board-time { font-weight: 600; }
+/* The destination takes what's left and gives way first. */
+.board-dest { width: 100%; max-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.board-plat { color: #cbc4ba; }
+.board-status { text-align: end; }
+.board-table tbody tr:first-child .board-time, .board-table tbody tr:first-child .board-status { font-size: 16px; font-weight: 700; }
+.board-table tbody tr:first-child .board-dest { font-weight: 600; }
+.board-table tbody tr + tr td { border-top: 1px solid color-mix(in srgb, #f5f3ef 10%, var(--board-bg)); padding-top: 4px; }
+.board-table tr[data-state="delayed"] .board-status { color: #f4b740; font-weight: 600; }
+.board-table tr[data-state="cancelled"] .board-time s { text-decoration-thickness: 2px; color: #cbc4ba; }
+.board-table tr[data-state="cancelled"] .board-status { color: #ff9e8c; font-weight: 600; }
+.board-table tr[data-state="on-time"] .board-status { color: #d6efd8; }
+.board-table td[data-changed] { animation: board-change 600ms ease-out; }
+@keyframes board-change { from { opacity: 0.2; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .board-table td[data-changed] { animation: none; }
+}
+
 /* The status pill, where a tile has no quick action: short text, never a control. */
 .tile-status { flex: none; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 10px; border-radius: var(--cw-radius-pill); border: 1px solid var(--cw-border-soft); background: var(--cw-canvas); color: color-mix(in srgb, var(--cw-ink) 82%, var(--cw-muted)); font-size: 12px; font-weight: 600; line-height: 1.4; }
 
