@@ -296,6 +296,10 @@ export interface AppHomePageOptions {
   css?: string;
   /** Same-site module scripts to load, e.g. the demo's. */
   scripts?: string[];
+  /** Quiet lines under the beta line, e.g. another way in during a changeover. */
+  links?: LandingLink[];
+  /** A note for the footer (e.g. a data credit), and the app's own links in place of the hub's Privacy. */
+  footer?: { note?: string; links?: LandingLink[] };
 }
 
 const HOME_CSS = `
@@ -322,6 +326,7 @@ const HOME_CSS = `
   .home-subtitle { font-size: 20px; line-height: 1.5; color: var(--cw-muted); }
   .home-supporting { font-size: 16px; line-height: 1.6; color: var(--cw-muted); }
   .home-hero .home-actions { margin-top: 12px; }
+  .home-beta-line + .home-beta-line { margin-top: -8px; }
   .home-beta-line { margin-top: 8px; font-size: 15px; line-height: 1.6; color: var(--cw-muted); }
   .home-slot { flex: 1 1 440px; min-width: 0; max-width: 560px; scroll-margin-top: calc(var(--cw-header-h) + 16px); }
 
@@ -415,6 +420,7 @@ export function renderAppHomePage(options: AppHomePageOptions): string {
           <a class="cw-button${actionHref ? "" : " cw-button--primary"}" href="${href}">Sign in to ${name}</a>
         </div>
         <p class="home-beta-line">Want it for your own family? If you have a beta code, <a href="${hubLink("/signup/")}">create your household</a>. Otherwise, <a href="${hubLink("/signup/?request=1")}">ask for one</a>.</p>
+        ${(options.links ?? []).map((link) => `<p class="home-beta-line">${linkHtml(link)}</p>`).join("\n        ")}
       </div>
       ${options.slot ? `<div class="home-slot" id="${escapeHtml(options.slot.id)}">${options.slot.html}</div>` : ""}
     </section>`;
@@ -484,8 +490,8 @@ export function renderAppHomePage(options: AppHomePageOptions): string {
     ${beta}
   </main>
   <footer class="home home-footer cw-footer cw-workspace" style="--home-accent: ${app.accent}">
-    <span>Cornerways &mdash; built for family and friends.</span>
-    <span class="home-footer-links"><a href="${hubLink("/privacy/")}">Privacy</a><a href="mailto:hello@cornerways.io">hello@cornerways.io</a><span>Est. 2026</span></span>
+    <span>Cornerways &mdash; built for family and friends.${options.footer?.note ? ` ${escapeHtml(options.footer.note)}` : ""}</span>
+    <span class="home-footer-links">${options.footer?.links ? options.footer.links.map((link) => linkHtml(link)).join("") : `<a href="${hubLink("/privacy/")}">Privacy</a>`}<a href="mailto:hello@cornerways.io">hello@cornerways.io</a><span>Est. 2026</span></span>
   </footer>
 ${scripts}
 </body>
