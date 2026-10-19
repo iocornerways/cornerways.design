@@ -149,3 +149,45 @@
   .app-tile, .app-tile .tile-arrow { transition: none; }
   .app-tile:hover, .app-tile:hover .tile-arrow { transform: none; }
 }
+
+/* A member's tiles: one stretched link on the app's name (.tile-link), the
+   quick action (.tile-action) a separate link above it. */
+.member-section { margin-top: 32px; }
+.member-section h2 { font-size: 24px; line-height: 1.2; margin: 0 0 16px; }
+.member-section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.member-section-head h2 { margin: 0; }
+.member-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; margin: 0; padding: 0; list-style: none; }
+.member-tiles--compact { gap: 16px; }
+.member-tile { position: relative; box-sizing: border-box; min-width: 0; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 18px; box-shadow: var(--cw-shadow-1); color: var(--cw-ink); transition: transform var(--cw-ease), box-shadow var(--cw-ease), border-color var(--cw-ease); }
+.member-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgb(31 29 26 / 0.09); border-color: var(--tile-accent); }
+.member-tile:has(.tile-link:focus-visible) { outline: 2px solid var(--tile-accent); outline-offset: 3px; }
+.member-tile .tile-link { color: inherit; text-decoration: none; }
+.member-tile .tile-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.member-tile .tile-link:focus-visible { outline: none; }
+.member-tile .tile-icon { --cw-app-accent: var(--tile-accent); }
+.member-tile--large { display: flex; flex-direction: column; padding: 20px; }
+.member-tile--large .tile-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.member-tile--large .tile-icon { width: 48px; height: 48px; border-radius: 14px; }
+.member-tile--large .tile-name { margin: 16px 0 0; font-family: var(--cw-font-display); font-size: 22px; font-weight: 600; }
+.member-tile--large .tile-glance { margin: 8px 0 0; font-size: 18px; line-height: 1.35; font-weight: 600; }
+.member-tile--large .tile-glance[data-state="fallback"] { font-size: 15px; line-height: 1.5; font-weight: 400; color: var(--cw-muted); }
+.member-tile--large .tile-glance-sub { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--cw-muted); }
+.member-tile--large .tile-glance-sub:empty { display: none; }
+.member-tile--large .tile-go { margin-top: auto; padding-top: 18px; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
+.member-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
+.member-tile:hover .tile-arrow { transform: translateX(4px); }
+.tile-action { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--cw-border); background: var(--cw-surface); color: var(--cw-ink); font-size: 14px; font-weight: 600; text-decoration: none; }
+.tile-action:hover { background: color-mix(in srgb, var(--tile-accent) 10%, var(--cw-surface)); border-color: var(--tile-accent); color: var(--cw-ink); }
+.tile-action:focus-visible { outline: 2px solid var(--tile-accent); outline-offset: 2px; }
+.member-tile--compact { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; }
+.member-tile--compact .tile-icon { width: 44px; height: 44px; border-radius: 12px; }
+.member-tile--compact .tile-body { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.member-tile--compact .tile-name { font-family: var(--cw-font-display); font-size: 18px; font-weight: 600; }
+.member-tile--compact .tile-glance { font-size: 14px; line-height: 1.4; font-weight: 500; }
+.member-tile--compact .tile-glance[data-state="fallback"] { font-weight: 400; color: var(--cw-muted); }
+.member-tile--compact .tile-chevron { flex: none; display: flex; color: var(--cw-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .member-tile, .member-tile .tile-arrow { transition: none; }
+  .member-tile:hover, .member-tile:hover .tile-arrow { transform: none; }
+}
