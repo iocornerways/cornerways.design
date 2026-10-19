@@ -159,11 +159,15 @@ function tileOf(key: TileKey): AppTile {
 /**
  * Each tile is one stretched link on the app's name (its glance line is its
  * description), with the quick action a separate link beside it, never
- * inside it. A large tile's panel holds the glance: it starts as the app's
- * description and the page fills it in later (data-glance, then a few of the
- * household's own rows in data-glance-rows); when nothing arrives the
- * description simply stays. Never sample data: a member would take it for
- * theirs.
+ * inside it. A tile with no quick action has a status pill there instead
+ * (data-glance-pill: text, never a control), filled in with the glance.
+ *
+ * A large tile's panel starts as the app's description; the page fills in
+ * the glance line (data-glance) and builds the panel body (data-panel-body:
+ * a headline, up to three rows, at most one hero) from it. When nothing
+ * arrives the description simply stays. Never sample data: a member would
+ * take it for theirs. The chevron is a quiet "this opens", for sight only:
+ * the link's name is the app's.
  *
  * With nothing left in More, the pinned tiles are simply "Your apps".
  */
@@ -172,18 +176,17 @@ export function renderMemberTiles(options: MemberTilesOptions): string {
     const tile = tileOf(key);
     const app = appOf(key);
     const base = appUrl(app, options.hostname);
-    const action = tile.quickAction
+    const corner = tile.quickAction
       ? `<a class="tile-action" href="${escapeHtml(base + tile.quickAction.path)}" aria-label="${escapeHtml(tile.quickAction.ariaLabel)}">${svg(Plus, 16)}${escapeHtml(tile.quickAction.label)}</a>`
-      : "";
+      : `<span class="tile-status" data-glance-pill="${key}" hidden></span>`;
     return `<li class="member-tile member-tile--large" style="--tile-accent: var(--cw-accent-${key})">
-        <span class="tile-head">${icon(app, 24)}${action}</span>
-        <h3 class="tile-name"><a class="tile-link" href="${escapeHtml(base)}/" aria-describedby="glance-${key} glance-${key}-sub">${escapeHtml(app.name)}</a></h3>
+        <span class="tile-head">${icon(app, 24)}${corner}</span>
+        <h3 class="tile-name"><a class="tile-link" href="${escapeHtml(base)}/" aria-describedby="glance-${key}">${escapeHtml(app.name)}</a></h3>
         <div class="tile-panel" data-panel="${key}">
           <p class="tile-glance" id="glance-${key}" data-glance="${key}" data-state="fallback">${escapeHtml(tile.description)}</p>
-          <p class="tile-glance-sub" id="glance-${key}-sub" data-glance-sub="${key}"></p>
-          <ul class="tile-panel-rows" data-glance-rows="${key}" hidden></ul>
+          <div class="tile-panel-body" data-panel-body="${key}" hidden></div>
         </div>
-        <span class="tile-go" aria-hidden="true">Open <span class="tile-arrow">→</span></span>
+        <span class="tile-chevron" aria-hidden="true">${svg(ChevronRight, 20)}</span>
       </li>`;
   };
   const compact = (key: TileKey) => {

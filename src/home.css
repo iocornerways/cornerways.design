@@ -169,33 +169,36 @@
 .member-tile--large .tile-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .member-tile--large .tile-icon { width: 48px; height: 48px; border-radius: 14px; }
 .member-tile--large .tile-name { margin: 16px 0 0; font-family: var(--cw-font-display); font-size: 22px; font-weight: 600; }
-.member-tile--large .tile-glance { margin: 8px 0 0; font-size: 18px; line-height: 1.35; font-weight: 600; }
+/* A large tile's panel: one pattern for every app. A headline, up to
+   three rows (label left, truncating first; value right, never wrapping),
+   and at most one hero. Panels grow to the tile, so rows line up across a
+   grid row; tabular numerals keep times and temperatures steady. */
+.member-tile--large .tile-panel { box-sizing: border-box; flex: 1 0 auto; display: flex; flex-direction: column; gap: 8px; min-height: 128px; margin-top: 14px; padding: 14px 16px; border-radius: 12px; background: var(--cw-canvas); font-variant-numeric: tabular-nums; }
+.member-tile--large .tile-glance { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 600; }
 .member-tile--large .tile-glance[data-state="fallback"] { font-size: 15px; line-height: 1.5; font-weight: 400; color: var(--cw-muted); }
-.member-tile--large .tile-glance-sub { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--cw-muted); }
-.member-tile--large .tile-glance-sub:empty { display: none; }
-/* A large tile's panel: its glance line, then a few of the household's own
-   rows (filled in by the page), in the signed-out tiles' sample style. Its
-   height is held from the start, so the tile doesn't jump as it fills. */
-.member-tile--large .tile-panel { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 8px; min-height: 124px; margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--cw-canvas); }
-.member-tile--large .tile-panel .tile-glance { margin: 0; font-size: 16px; line-height: 1.35; }
-.member-tile--large .tile-panel .tile-glance[data-state="fallback"] { font-size: 15px; }
-.member-tile--large .tile-panel .tile-glance[data-quiet] { display: none; }
-.member-tile--large .tile-panel .tile-glance-sub { margin: -4px 0 0; }
-.member-tile--large .tile-panel:has(.tile-panel-rows:not([hidden])) .tile-glance-sub { display: none; }
-.tile-panel-rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.4; }
-.tile-panel-rows li { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
-.tile-panel-rows .tile-row-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tile-panel-rows .tile-row-meta { flex: none; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); }
-.tile-panel-rows[data-panel="checks"] li { align-items: center; }
-.tile-panel-rows[data-panel="checks"] .tile-row-meta { font-weight: 500; color: var(--cw-muted); }
-.tile-panel-rows[data-panel="checks"] .tile-row-meta[data-overdue] { font-weight: 600; color: var(--cw-brand-text); }
-.member-tile--large .tile-panel:has([data-panel="figure"]:not([hidden])) { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; }
-.tile-panel-figure { grid-column: 1; grid-row: 1; font-family: var(--cw-font-display); font-size: 40px; font-weight: 600; line-height: 1; }
-.member-tile--large .tile-panel:has([data-panel="figure"]:not([hidden])) .tile-glance { display: none; }
-.tile-panel-rows[data-panel="figure"] { grid-column: 2; grid-row: 1; }
-.tile-panel-rows[data-panel="figure"] li:first-child { font-weight: 600; font-size: 16px; }
-.tile-panel-rows[data-panel="figure"] li + li { color: var(--cw-muted); }
-.member-tile--large .tile-go { margin-top: auto; padding-top: 18px; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 88%, var(--cw-ink)); }
+.member-tile--large .tile-glance[data-quiet] { display: none; }
+.tile-panel-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tile-panel-body[data-hero] { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; }
+.panel-hero { font-family: var(--cw-font-display); font-size: 40px; font-weight: 600; line-height: 1; }
+.panel-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.panel-headline, .panel-rows li { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin: 0; }
+.panel-headline { font-size: 16px; line-height: 1.35; font-weight: 600; }
+.panel-rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.4; }
+.panel-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel-value { flex: 0 0 auto; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: color-mix(in srgb, var(--tile-accent) 72%, var(--cw-ink)); }
+.panel-headline .panel-value { font-weight: 600; }
+.panel-rows li[data-muted] .panel-label, .panel-rows li[data-muted] .panel-value { color: var(--cw-muted); font-weight: 400; }
+.panel-rows li[data-alert] .panel-value { color: var(--cw-brand-text); }
+.panel-rows[data-checks] li { align-items: center; }
+.panel-rows[data-checks] .panel-value { font-weight: 500; color: var(--cw-muted); }
+.panel-rows[data-checks] li[data-alert] .panel-value { font-weight: 600; color: var(--cw-brand-text); }
+
+/* The status pill, where a tile has no quick action: short text, never a control. */
+.tile-status { flex: none; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 10px; border-radius: var(--cw-radius-pill); border: 1px solid var(--cw-border-soft); background: var(--cw-canvas); color: color-mix(in srgb, var(--cw-ink) 82%, var(--cw-muted)); font-size: 12px; font-weight: 600; line-height: 1.4; }
+
+/* "This opens": a quiet chevron, always shown, nudged on hover or focus. */
+.member-tile--large .tile-chevron { align-self: flex-end; display: flex; margin-top: 10px; color: var(--cw-muted); transition: transform var(--cw-ease), color var(--cw-ease); }
+.member-tile--large:hover .tile-chevron, .member-tile--large:has(.tile-link:focus-visible) .tile-chevron { transform: translateX(3px); color: color-mix(in srgb, var(--tile-accent) 80%, var(--cw-ink)); }
 .member-tile .tile-arrow { display: inline-block; transition: transform var(--cw-ease); }
 .member-tile:hover .tile-arrow { transform: translateX(4px); }
 .tile-action { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--cw-border); background: var(--cw-surface); color: var(--cw-ink); font-size: 14px; font-weight: 600; text-decoration: none; }
@@ -210,8 +213,8 @@
 .member-tile--compact .tile-chevron { flex: none; display: flex; color: var(--cw-muted); }
 
 @media (prefers-reduced-motion: reduce) {
-  .member-tile, .member-tile .tile-arrow { transition: none; }
-  .member-tile:hover, .member-tile:hover .tile-arrow { transform: none; }
+  .member-tile, .member-tile .tile-arrow, .member-tile .tile-chevron { transition: none; }
+  .member-tile:hover, .member-tile:hover .tile-arrow, .member-tile--large:hover .tile-chevron, .member-tile--large:has(.tile-link:focus-visible) .tile-chevron { transform: none; }
 }
 
 /* "Edit tiles": the button, an empty Pinned, and the editor that replaces the tiles. */
