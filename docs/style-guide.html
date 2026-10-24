@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
 <style>
 /* Layout: the shell itself. A full-bleed 56px header, then an 880px reading column, as the hub and Weather use.
-   Tokens are the real @cornerways/design values (tokens.css, v0.17.2). */
+   Tokens are the real @cornerways/design values (tokens.css, v0.36.0). */
 :root {
   --canvas: #f6f4f0;
   --header: #fbfaf8;
@@ -138,14 +138,14 @@ footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--bor
   <div class="hdr-in gut">
     <svg class="mark" viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 15V11C9.5 9.6193 10.6193 8.5 12 8.5H15.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     <span class="word">Cornerways</span><span class="slash">/</span><span class="app">Style guide</span>
-    <span class="sp"></span><span class="rev">Rev B · 17 Oct 2026</span>
+    <span class="sp"></span><span class="rev">Rev C · 24 Oct 2026</span>
   </div>
 </header>
 
 <main class="reading gut">
   <div class="intro">
     <h1>How every Cornerways site looks and behaves</h1>
-    <p>The rules are short because the shell is built once, in <strong><code>@cornerways/design</code></strong> (v0.17.2), and imported by every app. This page is drawn with the package's own tokens and sizes.</p>
+    <p>The rules are short because the shell is built once, in <strong><code>@cornerways/design</code></strong> (v0.36.0), and imported by every app. This page is drawn with the package's own tokens and sizes.</p>
     <p>The package README has the component API, and <code>npm run preview</code> shows every component in both themes. Source: <code>cornerways.design/docs/style-guide.md</code>.</p>
   </div>
 
@@ -251,6 +251,11 @@ footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--bor
           <tr><td><code>&lt;Header&gt;</code></td><td>Every page: app switcher, page-actions slot, account menu</td></tr>
           <tr><td><code>&lt;Toolbar&gt;</code></td><td>The 60px row under the header: children on the left, <code>end</code> on the right</td></tr>
           <tr><td><code>&lt;Footer&gt;</code></td><td>"Cornerways — built for family and friends." Hidden below 640px</td></tr>
+          <tr><td><code>&lt;Sheet&gt;</code> / <code>&lt;Field&gt;</code></td><td>A modal dialog: a card on wide screens, a sheet along the bottom on a phone. <code>Field</code> is a labelled 16px control with a hint or an error</td></tr>
+          <tr><td><code>&lt;FirstRunCard&gt;</code> / <code>&lt;EmptyState&gt;</code> / <code>&lt;Example&gt;</code></td><td>A first visit's intro, an empty screen, and the "Example" picture they share (see First run)</td></tr>
+          <tr><td><code>&lt;PlacePicker&gt;</code></td><td>Search for a town or postcode, over the app's <code>/api/places</code></td></tr>
+          <tr><td><code>useSession</code> / <code>useFamilyMembers</code> / <code>useFirstRun</code></td><td>Who's signed in, who's in the household, and what this person has already seen or set up</td></tr>
+          <tr><td>Return bar</td><td><code>@cornerways/design/return-bar</code>: the way back to the hub page that sent someone here</td></tr>
           <tr><td>Install card and service worker</td><td><code>@cornerways/design/install</code> and <code>/pwa</code>: every site installs as an app</td></tr>
         </tbody>
       </table>
@@ -265,6 +270,22 @@ footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--bor
       <li>Dark applies under <code>html[data-theme="dark"]</code>, set before first paint.</li>
       <li><strong>Auto</strong> follows the system on most apps. Weather, Trains and Home follow the time of day in London instead, since they are what the kitchen tablet shows.</li>
       <li><strong>The hub is light-only.</strong></li>
+    </ul>
+  </section>
+
+  <section id="first-run">
+    <div class="eyebrow">First run and empty states</div>
+    <h2>Ask on the screen that needs it, once</h2>
+    <p>Each app asks for what it needs the first time someone opens it, never in one big form up front. The pieces are <code>useFirstRun</code>, <code>&lt;FirstRunCard&gt;</code>, <code>&lt;EmptyState&gt;</code> and <code>&lt;PlacePicker&gt;</code>, with the server side in <code>@cornerways/design/first-run</code>. The hub keeps each person's progress.</p>
+    <ul>
+      <li><strong>Ask on the screen that needs it.</strong> One or two questions at a time, every one skippable; the app stays usable without the answer.</li>
+      <li><strong>Household facts are asked once.</strong> The town and the stations belong to the household: the first owner or editor to answer sets them for everyone. Already answered? Show it with Change.</li>
+      <li><strong>Never another household's data.</strong> With no setting there's nothing to show yet, so ask.</li>
+      <li><strong>One action.</strong> An intro card has one primary button and "Not now", which counts as seen. An empty state has one way to start.</li>
+      <li><strong>Examples say so.</strong> Pictures of the app in use carry an "Example" badge and are never saved as data.</li>
+      <li><strong>Not on shared screens.</strong> Nothing on a paired tablet or under <code>?kiosk=1</code>; viewers aren't asked household questions.</li>
+      <li><strong>Copy</strong> says what the app does for this household: "Add everyone's birthdays and Calendar reminds you a few weeks ahead." Not "Welcome to Calendar!".</li>
+      <li><strong>Homepage tiles</strong> for an app that isn't set up show what it needs and the action, never sales copy that looks like status.</li>
     </ul>
   </section>
 
@@ -284,7 +305,7 @@ footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--bor
     </ol>
   </section>
 
-  <footer><span>cornerways / style-guide / rev B / 2026-10-17</span><span>Source: <code>cornerways.design/docs/style-guide.md</code></span></footer>
+  <footer><span>cornerways / style-guide / rev C / 2026-10-24</span><span>Source: <code>cornerways.design/docs/style-guide.md</code></span></footer>
 </main>
 
 <script>

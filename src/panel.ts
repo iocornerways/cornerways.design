@@ -6,7 +6,9 @@
  * in home.css.
  *
  * Every panel is the same pieces: an optional headline, up to three rows (a
- * label, and a value on the right), and at most one hero.
+ * label, and a value on the right), and at most one hero. An app that
+ * isn't set up yet shows a setup panel instead: what it needs, and the
+ * action the tile's link leads to.
  */
 import { escapeHtml } from "./html.ts";
 
@@ -21,6 +23,13 @@ export interface Panel {
   hero?: { kind: "figure"; value: string } | Board | Spark;
   /** Weather's next six hours of rain chance, as small bars. */
   strip?: RainStrip;
+  /**
+   * The app needs setting up before it has anything to show ("Tell us your
+   * town to see your weather"), with the action as a chip ("Set your town").
+   * The tile's own link opens the app, where its first run asks; the chip
+   * isn't a second link. Shown instead of everything else.
+   */
+  setup?: { text: string; action: string };
   /** One bar split in proportion (Trips: been against want to go), keyed to the rows by their swatch. Decorative: the rows say the numbers. */
   bar?: Array<{ swatch: 1 | 2; value: number }>;
 }
@@ -94,6 +103,9 @@ function labelled(tag: "p" | "li", className: string, part: PanelRow, before = "
  * here: the visitor tile keeps its own sample.
  */
 export function renderPanel(panel: Panel): string {
+  if (panel.setup) {
+    return `<div class="tile-panel-body" data-setup><div class="panel-main"><p class="panel-setup">${escapeHtml(panel.setup.text)}</p><span class="panel-setup-action">${escapeHtml(panel.setup.action)}</span></div></div>`;
+  }
   const hero = panel.hero?.kind === "figure" ? panel.hero : null;
   const line = panel.hero?.kind === "spark" ? sparkPoints(panel.hero.points) : null;
   const spark = line

@@ -1,6 +1,12 @@
 import { Bell, CalendarPlus, Download, Plus, SlidersHorizontal, Users } from "lucide-react";
 import { useState } from "react";
-import { APPS, Button, Footer, Header, ICON_STROKE, IconButton, Pill, Reading, Segmented, Toolbar, ToolbarDivider, type Theme } from "../src/index.ts";
+import { APPS, Button, EmptyState, Field, FirstRunCard, Footer, Header, ICON_STROKE, IconButton, Pill, PlacePicker, Reading, Segmented, Toolbar, ToolbarDivider, type Theme } from "../src/index.ts";
+
+/** A picture made of the shared .v-* pieces, as an app's signed-out page builds its story pictures. */
+const OCCASIONS_PICTURE = `<ul class="v-list">
+  <li class="v-card"><span class="v-label">Sat 31 Oct</span><span class="v-card-row"><span class="v-what">Izzy's birthday</span><span class="v-badge">turns 11</span></span></li>
+  <li class="v-card"><span class="v-label">Sun 8 Nov</span><span class="v-card-row"><span class="v-what">Wedding anniversary</span><span class="v-sub">20 years</span></span></li>
+</ul>`;
 
 const DAVE = { name: "Dave", color: "#4c8bf5" };
 const PEOPLE = [
@@ -141,6 +147,40 @@ function Specimens({ theme, onTheme }: { theme: Theme; onTheme: (theme: Theme) =
             <span>{app.name}</span>
           </div>
         ))}
+      </div>
+
+      <h2>First run: the intro card on a first visit</h2>
+      <FirstRunCard
+        app="calendar"
+        title="Your family's year on one page"
+        line="Add everyone's birthdays and Calendar reminds you a few weeks ahead, on your Todo list."
+        example={{ html: OCCASIONS_PICTURE, label: "two birthdays coming up, with how old each person turns" }}
+        action={{ label: "Add a birthday", onClick: () => {} }}
+        onLater={() => {}}
+      />
+
+      <h2>First run: a household question</h2>
+      <FirstRunCard app="weather" title="Where's home?" line="Your town or postcode. Weather uses it for the whole household." action={{ label: "Use this town", onClick: () => {} }} onLater={() => {}}>
+        <PlacePicker onPick={() => {}} />
+      </FirstRunCard>
+
+      <h2>Empty state</h2>
+      <EmptyState
+        app="calendar"
+        title="Nothing coming up yet"
+        line="Birthdays and anniversaries show here, with a reminder before each one."
+        example={{ html: OCCASIONS_PICTURE, label: "two birthdays coming up" }}
+        action={{ label: "Add a birthday", onClick: () => {} }}
+      />
+
+      <h2>Field</h2>
+      <div className="pv-stack">
+        <Field label="Name" hint="As everyone in the household knows them.">
+          <input className="cw-input" defaultValue="Izzy" />
+        </Field>
+        <Field label="Birthday" error="Pick a date in the past">
+          <input className="cw-input" type="date" />
+        </Field>
       </div>
 
       <h2>Footer</h2>

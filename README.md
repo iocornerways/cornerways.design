@@ -61,6 +61,8 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | | `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
 | | `src/Header.tsx`, `src/useMenu.ts` | `<Header>`, and the keyboard and outside-tap behaviour its menus share |
 | | `src/FeedbackDialog.tsx`, `src/feedback.ts` | "Send feedback" from the account menu, and the recent-errors buffer it sends along |
+| | `src/Sheet.tsx` | `<Sheet>` (a modal dialog, a sheet on a phone) and `<Field>` |
+| | `src/FirstRun.tsx` | An app's first run in the page: `useFirstRun`, `<FirstRunCard>`, `<EmptyState>`, `<Example>`, `<PlacePicker>` |
 | | `src/controls.tsx`, `src/layout.tsx`, `src/PageTitle.tsx`, `src/Mark.tsx` | Buttons and other controls, `<Workspace>` / `<Reading>`, `<PageTitle>`, the mark |
 | | `src/theme.ts`, `src/useTheme.ts`, `src/session.ts` | The theme names and `useTheme`; `useSession`, `useFamilyMembers` and `throwIfNotOk` |
 | `…/auth` | `src/auth.ts` | Server-only. Sessions (verified with the hub's public key), the live check against the hub, roles and scope, device policy, the cross-site write guard (`originGuard`), the no-access page and `hubOrigin` |
@@ -68,6 +70,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | `…/flags` | `src/flags.ts` | Server-only feature flags: `resolveFlags(env, context, names)` asks the Confidence resolver Worker (binding `CONFIDENCE`) and `flags.get("flag.property", fallback)` reads the answer; any failure gives the fallback, and `FLAG_OVERRIDES` (JSON) is the instant kill switch |
 | `…/telemetry` | `src/telemetry.ts` | Server-only. Counts (never content) to the Analytics Engine dataset Mission Control reads |
 | `…/install`, `…/install.css`, `…/pwa` | `src/install/` | Installing as an app: the install card, and a Vite plugin that writes `/sw.js` with the offline page built in |
+| `…/first-run` | `src/first-run.ts` | Server-only. `registerFirstRunRoutes(app, { app })` (`/api/first-run`: this person's progress, kept by the hub) and `registerPlaceRoutes(app)` (`/api/places`, `PUT /api/household/location`) |
 | `…/landing` | `src/landing.ts` | Server-only. The page an app shows a signed-out visitor (below) |
 | `…/return-bar` | `src/returnBar.ts` | `initReturnBar()`: a "← Back to …" bar when another family page opened this app with `?return_to=`, checked against the family's hosts |
 | | `preview-site/` | The components in both themes plus a 390px frame: `npm run preview` |
@@ -109,6 +112,33 @@ const { theme, setTheme } = useTheme();
 - **Footer.** "Cornerways — built for family and friends." / "Est. 2026", in the reading column by default; hidden below 640px.
 - **PageTitle.** A sub-page's heading (`.cw-page-title`), with an optional back button: `<PageTitle title="Settings" onBack={…} />`.
 - **Icons.** lucide-react at `ICON_STROKE` (1.7), 18px in controls. `APP_ICONS[key]` is the app's line icon.
+- **Sheet and Field.** `<Sheet labelledBy onClose ref>` is open while rendered; put a `.cw-dialog-body` with a `.cw-dialog-title` and `.cw-dialog-actions` inside, and close it with `ref.current?.close()`. `<Field label hint error>` wraps one `<input className="cw-input">`.
+
+## First run
+
+Each app asks for what it needs the first time someone opens it (style guide, 07). On the server, after the auth gate, and with `personalWrite: true` for `FIRST_RUN_PATH` in the gate's `roleGate` call so a viewer can still dismiss an intro:
+
+```ts
+import { FIRST_RUN_PATH, registerFirstRunRoutes, registerPlaceRoutes, type FirstRunRpc, type PlacesRpc } from "@cornerways/design/first-run";
+
+registerFirstRunRoutes(app, { app: "weather" }); // GET/POST /api/first-run, through HOUSEHOLD.firstRun / markFirstRun
+registerPlaceRoutes(app);                         // GET /api/places, PUT /api/household/location (owners and editors)
+```
+
+In the page:
+
+```tsx
+const { steps, canSetHousehold, mark } = useFirstRun();
+{steps && !steps.intro && (
+  <FirstRunCard app="calendar" title="Your family's year on one page" line="…"
+    example={{ html: OCCASIONS_PICTURE, label: "two birthdays coming up" }}
+    action={{ label: "Add a birthday", onClick: () => { mark("intro", "done"); openAdd(); } }}
+    onLater={() => mark("intro", "seen")} />
+)}
+<EmptyState app="calendar" title="Nothing coming up yet" line="…" example={…} action={…} />
+```
+
+`steps` is null while loading and on a paired tablet or `?kiosk=1`, so nothing shows there. Example pictures are the app's own static markup made of the `.v-*` pieces its signed-out home page uses, shown with an "Example" badge.
 
 ## Hooks and helpers
 

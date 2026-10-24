@@ -1,8 +1,8 @@
 # Cornerways Style Guide
 
-**Current — Rev B, 2026-10-17**
+**Current — Rev C, 2026-10-24**
 
-How every Cornerways site looks and behaves. The rules are short because the shell is built once, in this package (`@cornerways/design`, v0.17.2), and imported by every app. The [README](../README.md) has the component API, and `npm run preview` shows the components in both themes.
+How every Cornerways site looks and behaves. The rules are short because the shell is built once, in this package (`@cornerways/design`, v0.36.0), and imported by every app. The [README](../README.md) has the component API, and `npm run preview` shows the components in both themes.
 
 > Visual copy: [Claude artifact AEbjBUxc](https://claude.ai/artifact/AEbjBUxcKrJu8ABMRbmraf) (source: `docs/style-guide.html`). Update both when the guide changes.
 
@@ -72,6 +72,11 @@ All from `@cornerways/design`. Use these before writing your own.
 | `<Pill>` | A fully rounded filter toggle, with an optional colour dot |
 | `<Segmented>` / `<SegmentedMulti>` | Pick one view / switch several filters on |
 | `<Footer>` | "Cornerways — built for family and friends." Hidden below 640px |
+| `<Sheet>` / `<Field>` | A modal `<dialog>`: a card on wide screens, a sheet along the bottom on a phone. `Field` is a labelled 16px control with a hint or an error |
+| `<FirstRunCard>` / `<EmptyState>` / `<Example>` | A first visit's intro, an empty screen, and the "Example" picture they share (see 07) |
+| `<PlacePicker>` | Search for a town or postcode, over the app's `/api/places` |
+| `useSession` / `useFamilyMembers` / `useFirstRun` | Who's signed in, who's in the household, and what this person has already seen or set up |
+| Return bar | `@cornerways/design/return-bar`: the way back to the hub page that sent someone here |
 | Install card + service worker | `@cornerways/design/install` and `/pwa`: every site installs as an app |
 
 ## 06 — Theme
@@ -81,15 +86,28 @@ All from `@cornerways/design`. Use these before writing your own.
 - **Auto** follows the system on most apps. Weather, Trains and Home follow the time of day in London instead, since they are what the kitchen tablet shows.
 - **The hub is light-only.**
 
-## 07 — Kiosk tablet
+## 07 — First run and empty states
+
+Each app asks for what it needs the first time someone opens it, never in one big form up front. The pieces are `useFirstRun`, `<FirstRunCard>`, `<EmptyState>` and `<PlacePicker>`, with the server side in `@cornerways/design/first-run` (`registerFirstRunRoutes`, `registerPlaceRoutes`). The hub keeps each person's progress.
+
+- **Ask on the screen that needs it.** Leave allowances are asked on Leave, not on first launch. One or two questions at a time, and every one can be skipped. The app stays usable without the answer.
+- **Household facts are asked once.** The town and the stations belong to the household: the first owner or editor to answer sets them for everyone. If the household already has the answer, show it with Change; don't ask again.
+- **Never another household's data.** With no setting there's nothing to show yet, so ask. Never fall back to the original household's town or stations.
+- **One action.** An intro card has one primary button and "Not now", and "Not now" counts as seen. An empty state has one way to start.
+- **Examples say so.** Pictures of the app in use are built from the signed-out home page's `.v-*` pieces, carry an "Example" badge and are never saved as data.
+- **Not on shared screens.** Nothing shows on a paired tablet or under `?kiosk=1`, and a viewer isn't asked household questions.
+- **Copy** is short, warm and plain, saying what the app does for this household: "Add everyone's birthdays and Calendar reminds you a few weeks ahead." Not "Welcome to Calendar!".
+- **Homepage tiles** for an app that isn't set up show a setup panel (`renderPanel`'s `setup`): what it needs and the action, never sales copy that looks like status.
+
+## 08 — Kiosk tablet
 
 `?kiosk=1` turns on kiosk mode; it is a mode, not a breakpoint. In kiosk mode the shared header and footer are hidden, and boards use large type, no hover and no scrolling. Installed home-screen apps keep the header. What each tablet shows, and when, is set per tablet on the hub (see [Kiosk tablets](https://github.com/iocornerways/cornerways/blob/main/docs/architecture/kiosk-tablets.md) in the hub repo).
 
-## 08 — Changing the shell
+## 09 — Changing the shell
 
 1. Change `cornerways.design`, check it in the preview site, then tag it (`git tag vX.Y.Z && git push --tags`).
 2. In each app: `npm install "@cornerways/design@git+https://github.com/iocornerways/cornerways.design.git#vX.Y.Z"`, then clear `node_modules/.vite` before restarting the dev server. Editing the tag in `package.json` by hand isn't enough.
 3. Deploy the hub first, then the apps.
 
 ---
-cornerways / style-guide / rev B / 2026-10-17
+cornerways / style-guide / rev C / 2026-10-24

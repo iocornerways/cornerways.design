@@ -649,7 +649,7 @@
   white-space: nowrap;
 }
 
-/* ---------- Dialog (FeedbackDialog) ---------- */
+/* ---------- Dialog (Sheet, FeedbackDialog) and fields (Field) ---------- */
 
 /* A native modal <dialog>: centred card on wide screens, a sheet along the
    bottom on a phone. Fields are 16px so iOS doesn't zoom into them. */
@@ -821,6 +821,217 @@
   .cw-dialog-actions .cw-button {
     flex: 1;
     height: 48px;
+    font-size: 16px;
+  }
+}
+
+.cw-field-hint {
+  color: var(--cw-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cw-field-error {
+  color: #b3261e;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+:root[data-theme="dark"] .cw-field-error,
+:root.dark .cw-field-error,
+[data-cw-theme="dark"] .cw-field-error {
+  color: #f2b8b5;
+}
+
+/* ---------- Example pictures (signed-out home pages and in-app examples) ---------- */
+
+/* The pieces an app's story pictures are made of. --home-accent is the
+   app's colour: set on the home page's <main class="home">, and on
+   .cw-example (FirstRun.tsx) inside an app. */
+.v-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.v-what { flex: 1; min-width: 0; font-size: 15px; }
+.v-dot { width: 10px; height: 10px; border-radius: 50%; }
+.v-card { display: grid; gap: 2px; padding: 12px 14px; background: var(--cw-surface); border: 1px solid var(--cw-border-soft); border-radius: 12px; }
+.v-label { font-size: 12px; font-weight: 600; color: var(--cw-muted); }
+.v-card-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; font-size: 16px; }
+.v-sub { font-size: 14px; color: var(--cw-muted); }
+.v-badge { display: inline-block; padding: 3px 9px; border-radius: var(--cw-radius-pill); background: color-mix(in srgb, var(--home-accent) 14%, var(--cw-surface)); color: var(--home-accent-text); font-size: 12px; font-weight: 600; }
+.v-arrow { display: flex; justify-content: center; color: var(--cw-muted); }
+.v-avatar { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--cw-border-softer); color: var(--cw-muted); font-size: 14px; font-weight: 600; }
+
+/* ---------- First run and empty states (FirstRun.tsx) ---------- */
+
+/* An example picture in an app: its own quiet panel, badged "Example" so
+   nobody takes it for their own data. */
+.cw-example {
+  --home-accent-text: color-mix(in srgb, var(--home-accent) 80%, black);
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed var(--cw-border);
+  border-radius: var(--cw-radius-card-lg);
+  background: var(--cw-canvas);
+  text-align: left;
+}
+
+:root[data-theme="dark"] .cw-example,
+:root.dark .cw-example,
+[data-cw-theme="dark"] .cw-example {
+  --home-accent-text: color-mix(in srgb, var(--home-accent) 55%, white);
+}
+
+.cw-example-badge {
+  justify-self: start;
+}
+
+/* The intro on a first visit: a card at the top of the page. */
+.cw-first-run {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px 28px;
+  margin-block: 16px;
+  padding: 22px;
+  border: 1px solid var(--cw-border-soft);
+  border-radius: var(--cw-radius-card-lg);
+  background: var(--cw-surface);
+  box-shadow: var(--cw-shadow-1);
+}
+
+.cw-first-run:not(:has(.cw-example)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cw-first-run-text {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+/* Doubled up so an app's own h2 rules don't reach in. */
+.cw-first-run .cw-first-run-title,
+.cw-empty .cw-empty-title {
+  margin: 0;
+  padding: 0;
+  color: var(--cw-ink);
+  font-family: var(--cw-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.cw-first-run-line,
+.cw-empty-line {
+  margin: 0;
+  color: var(--cw-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.cw-first-run-text > :is(.cw-place-picker, .cw-field) {
+  justify-self: stretch;
+}
+
+.cw-first-run-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cw-first-run-actions .cw-button,
+.cw-empty > .cw-button {
+  height: 44px;
+  padding-inline: 18px;
+}
+
+/* An empty screen: the example, what goes here, and the one way to start. */
+.cw-empty {
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 440px;
+  margin: 32px auto;
+  padding-inline: var(--cw-gutter);
+  text-align: center;
+}
+
+.cw-empty > .cw-example {
+  justify-self: stretch;
+  margin-bottom: 8px;
+}
+
+/* A town or postcode search (PlacePicker). */
+.cw-place-picker {
+  display: grid;
+  gap: 8px;
+}
+
+.cw-place-picker-note {
+  margin: 0;
+  color: var(--cw-muted);
+  font-size: 14px;
+}
+
+.cw-place-picker-results {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cw-place-picker-choice {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--cw-border-soft);
+  border-radius: var(--cw-radius-control);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cw-place-picker-choice:hover {
+  border-color: var(--cw-border);
+}
+
+.cw-place-picker-choice:focus-visible {
+  outline: none;
+  border-color: var(--cw-brand);
+  box-shadow: var(--cw-focus-ring);
+}
+
+@media (max-width: 639.98px) {
+  .cw-first-run {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 18px var(--cw-gutter);
+    border-radius: var(--cw-radius-card);
+  }
+
+  .cw-first-run-actions,
+  .cw-first-run-actions .cw-button {
+    width: 100%;
+  }
+
+  .cw-first-run-actions .cw-button,
+  .cw-empty > .cw-button {
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .cw-place-picker-choice {
+    min-height: 48px;
     font-size: 16px;
   }
 }

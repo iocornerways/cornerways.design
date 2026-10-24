@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { hubUrl, type AppKey } from "./apps.ts";
 import { Button, Segmented } from "./controls.tsx";
 import { recentErrors } from "./feedback.ts";
+import { Sheet } from "./Sheet.tsx";
 
 type Kind = "bug" | "idea";
 
@@ -27,7 +28,7 @@ type State = { step: "editing"; error: string | null } | { step: "sending" } | {
  * "Send feedback" from the account menu: a bug or an idea, with the page,
  * the device and the page's recent errors sent along, to the hub's
  * POST /api/feedback (with the shared cookie) for Mission Control's inbox.
- * A native modal <dialog>, so focus, Escape and the backdrop come free.
+ * A Sheet (a native modal <dialog>), so focus, Escape and the backdrop come free.
  */
 export function FeedbackDialog({ app, hostname, onClose }: FeedbackDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -41,9 +42,7 @@ export function FeedbackDialog({ app, hostname, onClose }: FeedbackDialogProps) 
   const viewport = typeof window === "undefined" ? "" : `${window.innerWidth}x${window.innerHeight}`;
 
   useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-    // showModal focuses the first control (the kind toggle); start at the title instead.
+    // The Sheet's showModal focuses the first control (the kind toggle); start at the title instead.
     titleRef.current?.focus();
   }, []);
 
@@ -84,7 +83,7 @@ export function FeedbackDialog({ app, hostname, onClose }: FeedbackDialogProps) 
   const sending = state.step === "sending";
 
   return (
-    <dialog ref={ref} className="cw-dialog" aria-labelledby="cw-feedback-title" onClose={onClose}>
+    <Sheet ref={ref} labelledBy="cw-feedback-title" onClose={onClose}>
       {state.step === "sent" ? (
         <div className="cw-dialog-body">
           <h2 className="cw-dialog-title" id="cw-feedback-title">
@@ -164,6 +163,6 @@ export function FeedbackDialog({ app, hostname, onClose }: FeedbackDialogProps) 
           </div>
         </form>
       )}
-    </dialog>
+    </Sheet>
   );
 }

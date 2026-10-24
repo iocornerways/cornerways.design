@@ -1,6 +1,6 @@
 {
   "name": "@cornerways/design",
-  "version": "0.35.1",
+  "version": "0.36.0",
   "private": true,
   "description": "The shared Cornerways shell: design tokens, fonts, layout modes, header and controls, used by every *.cornerways.io site.",
   "type": "module",
@@ -17,6 +17,7 @@
     "./pwa": "./src/install/pwa.js",
     "./return-bar": "./src/returnBar.ts",
     "./agent": "./src/agent.ts",
+    "./first-run": "./src/first-run.ts",
     "./landing": "./src/landing.ts",
     "./tiles": "./src/tiles.ts",
     "./styles.css": "./src/styles.css",
