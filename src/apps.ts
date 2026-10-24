@@ -33,7 +33,7 @@ export const APPS: readonly AppDefinition[] = [
   { key: "home", name: "Home", description: "Heating, lights, and everything smart under our roof.", host: "home.cornerways.io", devPort: 5174, accent: "#3f6b4f", mode: "reading" },
   { key: "calendar", name: "Calendar", description: "The household's shared calendar and planner.", host: "calendar.cornerways.io", devPort: 5179, accent: "#7a4e9e", mode: "workspace" },
   { key: "todo", name: "Todo", description: "Shared household lists and chores, for everyone to see.", host: "todo.cornerways.io", devPort: 5178, accent: "#8a6a12", mode: "workspace" },
-  { key: "weather", name: "Weather", description: "Current conditions and the outlook for Fleet, at a glance.", host: "weather.cornerways.io", devPort: 5177, accent: "#1f6f8b", mode: "reading" },
+  { key: "weather", name: "Weather", description: "Current conditions and the outlook where you live, at a glance.", host: "weather.cornerways.io", devPort: 5177, accent: "#1f6f8b", mode: "reading" },
   { key: "trips", name: "Trips", description: "Trip memories, and planning the next one together.", host: "travel.cornerways.io", devPort: 5176, accent: "#b4401e", mode: "workspace" },
   { key: "trains", name: "Trains", description: "Live train times and the daily commute, sorted.", host: "trains.cornerways.io", devPort: 5175, accent: "#2f5fc4", mode: "reading" },
   { key: "food", name: "Food", description: "Weekly meal planning, recipes, and what's in the fridge, freezer and cupboard.", host: "food.cornerways.io", devPort: 5180, accent: "#a33a2a", mode: "workspace" },
