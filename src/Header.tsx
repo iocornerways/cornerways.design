@@ -1,7 +1,9 @@
-import { Check, ChevronDown, House, LayoutGrid, LogOut, Settings, UserRound, Users } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import { Check, ChevronDown, House, LayoutGrid, LogOut, MessageSquare, Settings, UserRound, Users } from "lucide-react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { APPS, appUrl, getApp, hubUrl, type AppKey } from "./apps.ts";
 import { Button, Segmented } from "./controls.tsx";
+import { installErrorBuffer } from "./feedback.ts";
+import { FeedbackDialog } from "./FeedbackDialog.tsx";
 import { APP_ICONS, ICON_STROKE } from "./icons.tsx";
 import { Mark } from "./Mark.tsx";
 import { THEMES, type Theme } from "./theme.ts";
@@ -38,6 +40,11 @@ export interface HeaderProps {
   householdHref?: string | null;
   /** How to sign out. Omit to leave Log out of the menu. */
   logout?: LogoutAction;
+  /**
+   * "Send feedback" in the account menu, on whenever someone is signed in
+   * (`account` is set). false leaves it out, e.g. for a paired tablet.
+   */
+  feedback?: boolean;
   /** The current hostname; defaults to the browser's. Lets the hub pick dev ports and test hosts. */
   hostname?: string;
 }
@@ -52,10 +59,14 @@ function currentHostname(hostname?: string): string {
  * (back to the hub), a slash, then the app's name, which opens the app
  * switcher. Right: this page's actions, a divider, then the account menu.
  */
-export function Header({ app, actions, account, theme, settingsHref, onSettings, householdHref, logout, hostname }: HeaderProps) {
+export function Header({ app, actions, account, theme, settingsHref, onSettings, householdHref, logout, feedback = true, hostname }: HeaderProps) {
   const host = currentHostname(hostname);
   const hub = hubUrl(host);
   const household = householdHref === undefined ? `${hub}/household` : householdHref;
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
+  // Keeps the page's recent errors for a feedback report, from the first render on.
+  useEffect(installErrorBuffer, []);
 
   return (
     <header className="cw-header">
@@ -98,11 +109,13 @@ export function Header({ app, actions, account, theme, settingsHref, onSettings,
                 onSettings={onSettings}
                 householdHref={household}
                 logout={logout}
+                onFeedback={feedback && account ? () => setFeedbackOpen(true) : undefined}
               />
             )}
           </>
         )}
       </div>
+      {feedbackOpen && <FeedbackDialog app={app} hostname={host} onClose={() => setFeedbackOpen(false)} />}
     </header>
   );
 }
@@ -169,13 +182,14 @@ interface AccountMenuProps {
   onSettings?: () => void;
   householdHref: string | null;
   logout?: LogoutAction;
+  onFeedback?: () => void;
 }
 
 function initialOf(name: string): string {
   return name.trim().charAt(0).toUpperCase();
 }
 
-function AccountMenu({ account, theme, settingsHref, onSettings, householdHref, logout }: AccountMenuProps) {
+function AccountMenu({ account, theme, settingsHref, onSettings, householdHref, logout, onFeedback }: AccountMenuProps) {
   const menu = useMenu();
   const label = account ? `${account.name}. Account menu` : "Account menu";
 
@@ -250,6 +264,12 @@ function AccountMenu({ account, theme, settingsHref, onSettings, householdHref, 
             </a>
           )}
           {settingsItem}
+          {onFeedback && (
+            <button type="button" className="cw-menu-item" role="menuitem" onClick={() => { menu.close(); onFeedback(); }}>
+              <MessageSquare size={18} strokeWidth={ICON_STROKE} aria-hidden="true" />
+              <span className="cw-menu-item-label">Send feedback</span>
+            </button>
+          )}
           {logout && (
             <>
               <div className="cw-menu-divider" role="separator" />

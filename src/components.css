@@ -649,6 +649,183 @@
   white-space: nowrap;
 }
 
+/* ---------- Dialog (FeedbackDialog) ---------- */
+
+/* A native modal <dialog>: centred card on wide screens, a sheet along the
+   bottom on a phone. Fields are 16px so iOS doesn't zoom into them. */
+.cw-dialog {
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 2 * var(--cw-gutter)));
+  max-height: calc(100dvh - 2 * var(--cw-gutter));
+  padding: 0;
+  border: 1px solid var(--cw-border-soft);
+  border-radius: var(--cw-radius-card-lg);
+  background: var(--cw-surface-raised);
+  color: var(--cw-ink);
+  box-shadow: var(--cw-shadow-3);
+  font-family: var(--cw-font-ui);
+  font-size: 15px;
+}
+
+.cw-dialog::backdrop {
+  background: rgb(20 18 16 / 0.45);
+}
+
+.cw-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+}
+
+/* Doubled up so a page's own h2 rules don't reach in. */
+.cw-dialog .cw-dialog-title {
+  margin: 0;
+  padding: 0;
+  color: var(--cw-ink);
+  font-family: var(--cw-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.cw-dialog-text {
+  margin: 0;
+  color: var(--cw-muted);
+  line-height: 1.5;
+}
+
+.cw-dialog-kind {
+  align-self: flex-start;
+}
+
+.cw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cw-field-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cw-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius-control);
+  background: var(--cw-surface);
+  color: var(--cw-ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.cw-input::placeholder {
+  color: var(--cw-muted);
+  opacity: 0.8;
+}
+
+.cw-input:focus-visible {
+  outline: none;
+  border-color: var(--cw-brand);
+  box-shadow: var(--cw-focus-ring);
+}
+
+.cw-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.cw-dialog-details {
+  color: var(--cw-muted);
+  font-size: 13px;
+}
+
+.cw-dialog-details summary {
+  cursor: pointer;
+  padding-block: 4px;
+}
+
+.cw-dialog-details dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  margin: 8px 0 0;
+}
+
+.cw-dialog-details dt {
+  font-weight: 600;
+}
+
+.cw-dialog-details dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cw-dialog-details ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.cw-dialog-error {
+  margin: 0;
+  color: #b3261e;
+  font-weight: 500;
+}
+
+:root[data-theme="dark"] .cw-dialog-error,
+:root.dark .cw-dialog-error,
+[data-cw-theme="dark"] .cw-dialog-error {
+  color: #f2b8b5;
+}
+
+.cw-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cw-dialog-actions .cw-button {
+  height: 44px;
+  padding-inline: 18px;
+}
+
+@media (max-width: 639.98px) {
+  .cw-dialog {
+    width: 100vw;
+    max-width: none;
+    max-height: 92dvh;
+    margin: auto 0 0;
+    border-radius: var(--cw-radius-card-lg) var(--cw-radius-card-lg) 0 0;
+  }
+
+  .cw-dialog-body {
+    padding: 20px var(--cw-gutter) max(20px, env(safe-area-inset-bottom));
+  }
+
+  .cw-dialog-kind {
+    align-self: stretch;
+  }
+
+  .cw-dialog-kind .cw-segment {
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .cw-dialog-actions .cw-button {
+    flex: 1;
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
 /* ---------- Return bar (returnBar.ts) ---------- */
 
 /* Along the bottom, clear of every app's sticky header: the way back to

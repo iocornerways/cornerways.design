@@ -60,6 +60,7 @@ import { Workspace, Reading, APPS, appUrl } from "@cornerways/design";
 | | `src/components.css` | Styles for the header, menus, buttons, pills, segmented controls, toolbar, app chips and footer (`.cw-*`) |
 | | `src/apps.ts`, `src/icons.tsx` | The app list: names, hosts, dev ports, accents, layout mode, and one line icon per app |
 | | `src/Header.tsx`, `src/useMenu.ts` | `<Header>`, and the keyboard and outside-tap behaviour its menus share |
+| | `src/FeedbackDialog.tsx`, `src/feedback.ts` | "Send feedback" from the account menu, and the recent-errors buffer it sends along |
 | | `src/controls.tsx`, `src/layout.tsx`, `src/PageTitle.tsx`, `src/Mark.tsx` | Buttons and other controls, `<Workspace>` / `<Reading>`, `<PageTitle>`, the mark |
 | | `src/theme.ts`, `src/useTheme.ts`, `src/session.ts` | The theme names and `useTheme`; `useSession`, `useFamilyMembers` and `throwIfNotOk` |
 | `…/auth` | `src/auth.ts` | Server-only. Sessions (verified with the hub's public key), the live check against the hub, roles and scope, device policy, the cross-site write guard (`originGuard`), the no-access page and `hubOrigin` |
@@ -99,7 +100,7 @@ const { theme, setTheme } = useTheme();
 <Workspace as="main">…</Workspace>
 ```
 
-- **Header.** Left: mark + wordmark (to the hub), `/`, the app name. The app name opens the switcher: every app from `APPS` with its icon chip in its accent, the current one ticked, "All apps overview" at the bottom. Right: the `actions` slot, a divider when there are actions, then the account menu with avatar and name, Theme (Light / Dark / Auto), Household, Settings and Log out. Below 640px the wordmark, slash and account name hide. `app={null}` gives the hub's header: mark, wordmark and a Household button.
+- **Header.** Left: mark + wordmark (to the hub), `/`, the app name. The app name opens the switcher: every app from `APPS` with its icon chip in its accent, the current one ticked, "All apps overview" at the bottom. Right: the `actions` slot, a divider when there are actions, then the account menu with avatar and name, Theme (Light / Dark / Auto), Household, Settings and Log out. When someone is signed in the menu also has **Send feedback**: a dialog (a sheet on a phone) for a bug or an idea, posted to the hub's `POST /api/feedback` with the page, viewport, user agent and the page's last ten errors, for Mission Control's Feedback inbox. Header installs the error buffer (`installErrorBuffer`: uncaught errors, unhandled rejections and `console.error`, kept in sessionStorage across reloads); `feedback={false}` leaves the item out. Below 640px the wordmark, slash and account name hide. `app={null}` gives the hub's header: mark, wordmark and a Household button.
 - **Buttons.** `variant="primary"` is terracotta with white text: one per page. `secondary` (default) is bordered. `ghost` is quiet. All 40px tall, radius 10. `<IconButton>` is 40×40 and takes `active` for a toggle that is on.
 - **Pill.** Fully rounded filter toggle, 40px, optional colour `dot`.
 - **Segmented.** Grey track, white active segment; `size="sm"` for inside menus. Options can be `disabled` with a `title`.
