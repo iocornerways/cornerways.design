@@ -697,8 +697,16 @@
   line-height: 1.5;
 }
 
-.cw-dialog-kind {
-  align-self: flex-start;
+/* Full width, two equal halves: the shared Segmented sizes each segment
+   from the shortest label, so "Something's wrong" spilled out of its half. */
+.cw-dialog .cw-dialog-kind {
+  display: flex;
+  align-self: stretch;
+  height: 44px;
+}
+
+.cw-dialog-kind .cw-segment {
+  font-size: 15px;
 }
 
 .cw-field {
@@ -808,15 +816,6 @@
 
   .cw-dialog-body {
     padding: 20px var(--cw-gutter) max(20px, env(safe-area-inset-bottom));
-  }
-
-  .cw-dialog-kind {
-    align-self: stretch;
-  }
-
-  .cw-dialog-kind .cw-segment {
-    flex: 1;
-    min-height: 44px;
   }
 
   .cw-dialog-actions .cw-button {
